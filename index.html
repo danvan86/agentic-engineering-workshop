@@ -1,0 +1,3532 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Agentic Engineering Workshop</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F5F7FA;
+  --grid:rgba(20,40,70,.075);
+  --surface:#FFFFFF;
+  --surface-2:#EEF2F6;
+  --line:#DCE2E9;
+  --line-soft:#E9EDF2;
+  --dline:#AFB9C6;
+  --ink:#0B1220;
+  --ink-2:#4A5668;
+  --muted:#7A8696;
+  --accent:#1A6DFF;
+  --accent-soft:#EAF2FF;
+  --accent-line:#A4C5FF;
+  --cyan:#0C8EA3;
+  --cyan-soft:#E5F5F7;
+  /* names used inside the diagrams */
+  --flow:var(--accent);
+  --flow-soft:var(--cyan-soft);
+  --signal-soft:var(--accent-soft);
+  --good:#11805B;
+  --bad:#D03A4A;
+  --code:#0D1524;
+  --code-ink:#C6D0DD;
+  --code-hi:#82B6FF;
+  --code-mute:#6C7B90;
+  --code-t:#62D3E6;
+  --header-bg:rgba(255,255,255,.92);
+  --accent-hair:rgba(26,109,255,.16);
+  --cyan-line:#A9DCE4;
+  --bad-line:#F1BEC5;
+  --pri-hover:#1E2A3F;
+  --sans:"Geist","Helvetica Neue",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+h1,h2,h3,h4{margin:0;text-wrap:balance}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- dark look (toggle in the header) ---------- */
+body.dark{
+  --ground:#0A0F17;
+  --grid:rgba(150,180,225,.065);
+  --surface:#111824;
+  --surface-2:#182131;
+  --line:#253145;
+  --line-soft:#1A2433;
+  --dline:#4A586E;
+  --ink:#E8EEF6;
+  --ink-2:#A9B5C6;
+  --muted:#76849A;
+  --accent:#5B96FF;
+  --accent-soft:rgba(91,150,255,.13);
+  --accent-line:rgba(91,150,255,.5);
+  --cyan:#42C9DC;
+  --cyan-soft:rgba(66,201,220,.12);
+  --good:#41CC91;
+  --bad:#FF6F7E;
+  --code:#070B12;
+  --header-bg:rgba(10,15,23,.92);
+  --accent-hair:rgba(91,150,255,.2);
+  --cyan-line:rgba(66,201,220,.45);
+  --bad-line:rgba(255,111,126,.45);
+  --pri-hover:#C8D2DF;
+  color-scheme:dark;
+}
+body.dark .pcode,body.dark .prompt pre{box-shadow:0 0 0 1px var(--line)}
+body.dark .pk::before{box-shadow:0 0 0 1px var(--line)}
+
+/* ---------- header ---------- */
+header{
+  flex:0 0 auto;display:flex;align-items:center;gap:16px;
+  padding:0 clamp(12px,3vw,32px);height:56px;
+  background:var(--header-bg);border-bottom:1px solid var(--line);
+  position:relative;z-index:20;
+}
+.brand{font-weight:600;font-size:15px;letter-spacing:-.01em;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:500}
+.chapter{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.chapter::before{content:"/";margin-right:12px;color:var(--line)}
+.seg{display:flex;gap:2px;border:1px solid var(--line);border-radius:9px;padding:3px;background:var(--surface-2);flex:0 0 auto}
+.seg button{
+  font-weight:500;font-size:13.5px;letter-spacing:-.005em;
+  background:transparent;color:var(--ink-2);border:0;border-radius:6px;padding:5px 12px;cursor:pointer;line-height:1.2;
+}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-selected="true"],.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 1px 2px rgba(11,18,32,.06)}
+#langs button{font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:5px 9px}
+#tabs{margin-left:auto}
+.look{flex:0 0 auto;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);cursor:pointer;padding:0}
+.look:hover{border-color:var(--dline)}
+.look svg{width:17px;height:17px;fill:none;stroke:var(--ink-2);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.look .i-sun{display:none}
+body.dark .look .i-sun{display:block}
+body.dark .look .i-moon{display:none}
+.rail-track{position:absolute;left:0;right:0;bottom:-1px;height:2px}
+.rail{height:2px;width:0;background:var(--accent);transition:width .3s ease}
+@media(max-width:860px){.chapter{display:none}}
+@media(max-width:640px){.brand{display:none}.seg button{padding:5px 8px;font-size:13px}}
+
+/* ---------- views ---------- */
+main{flex:1 1 auto;min-height:0;position:relative}
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden}
+.deck{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+.slide{
+  scroll-snap-align:start;scroll-snap-stop:always;
+  min-height:100%;display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(28px,5vh,60px) clamp(16px,5vw,68px);
+  border-bottom:1px solid var(--line-soft);
+  background-image:radial-gradient(var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;background-position:12px 12px;
+}
+.inner{width:100%;max-width:1120px;margin:0 auto}
+
+/* ---------- type ---------- */
+.eyebrow{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 18px;
+}
+.eyebrow::before{content:"";width:7px;height:7px;background:var(--accent);border-radius:1px;flex:0 0 auto}
+.slide h2{font-weight:600;font-size:clamp(30px,4.2vw,50px);line-height:1.08;letter-spacing:-.032em}
+.lede{color:var(--ink-2);font-size:clamp(16px,1.6vw,19px);max-width:62ch;margin:16px 0 0;line-height:1.55}
+.hz{display:none}
+.title-slide h1{font-weight:600;font-size:clamp(42px,7.4vw,92px);line-height:.98;letter-spacing:-.045em}
+.title-slide h1 span,.statement span{color:var(--accent)}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:34px}
+.chip{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:6px 13px;background:var(--surface)}
+.statement{font-weight:600;font-size:clamp(30px,4.8vw,60px);line-height:1.08;letter-spacing:-.038em;max-width:21ch;margin:0}
+.attrib{margin-top:28px;color:var(--muted);font-size:17px;max-width:58ch;line-height:1.6}
+.tiny{font-family:var(--mono);font-size:.82em;color:var(--accent);background:var(--accent-soft);padding:2px 7px;border-radius:5px}
+
+figure{margin:26px 0 0}
+.dg{width:100%;height:auto;display:block}
+figcaption{margin-top:16px;font-size:15px;color:var(--muted);line-height:1.55;max-width:78ch}
+
+/* ---------- cards ---------- */
+.cols{display:grid;gap:16px;margin-top:26px}
+@media(min-width:740px){.cols.c2{grid-template-columns:1fr 1fr}.cols.c3{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+.card h4{font-weight:600;font-size:20px;line-height:1.2;letter-spacing:-.02em;margin:0 0 10px}
+.card p{margin:0;color:var(--ink-2);font-size:15.5px;line-height:1.55}
+.card p.after{margin-top:14px}
+.card.hi{background:var(--accent-soft);border-color:var(--accent-line)}
+.card.tl{background:var(--cyan-soft);border-color:var(--cyan-line)}
+.card.tl .k{color:var(--cyan)}
+.card .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px}
+.card.hi .k{color:var(--accent)}
+.card code,.notebox code,.lede code{font-family:var(--mono);font-size:.84em;color:var(--accent);background:var(--accent-soft);padding:1px 6px;border-radius:5px}
+.card.hi code{background:var(--surface)}
+.card h4 code{font-size:.78em}
+.card ul{margin:12px 0 0;padding-left:18px;color:var(--ink-2);font-size:15.5px;line-height:1.5;display:grid;gap:6px}
+.card ul li::marker{color:var(--accent)}
+.ict{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;margin-bottom:16px;background:var(--surface-2)}
+.card.hi .ict{background:var(--surface);box-shadow:0 0 0 1px var(--accent-line)}
+.ic{width:21px;height:21px;fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.card.hi .ic{stroke:var(--accent)}
+.kv{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:15.5px}
+.card.hi .kv{border-color:var(--accent-hair)}
+.kv span{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;flex:0 0 auto}
+.kv b{font-weight:600;color:var(--ink);text-align:right}
+.kv b.bad{color:var(--bad)} .kv b.acc{color:var(--accent)}
+
+ul.plain{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:12px;max-width:66ch}
+ul.plain li{display:flex;gap:14px;align-items:baseline;color:var(--ink-2);font-size:clamp(16px,1.7vw,19px)}
+ul.plain li b{color:var(--ink);font-weight:600}
+ul.plain li::before{content:attr(data-n);font-family:var(--mono);font-size:13px;color:var(--accent);flex:0 0 auto;min-width:22px}
+
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:26px 0 0;columns:1}
+@media(min-width:820px){ol.steps{columns:2;column-gap:48px}}
+ol.steps li{counter-increment:s;display:flex;gap:16px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);font-size:17px;color:var(--ink-2);break-inside:avoid}
+ol.steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:12.5px;color:var(--muted);min-width:24px;font-variant-numeric:tabular-nums}
+ol.steps li.mark{color:var(--ink);font-weight:500}
+ol.steps li.mark::before{color:var(--accent)}
+
+/* ---------- split + prompt boxes ---------- */
+.split{display:grid;gap:28px;margin-top:24px;align-items:start}
+@media(min-width:900px){.split{grid-template-columns:1fr 1.1fr}.split.tl{grid-template-columns:1.25fr 1fr}}
+.pk{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.pk::before{content:"›_";font-size:11px;letter-spacing:0;color:var(--code-hi);background:var(--code);padding:2px 6px;border-radius:5px;text-transform:none}
+.pcode{
+  background:var(--code);border-radius:12px;padding:18px 20px;
+  font-family:var(--mono);font-size:clamp(11.5px,1.05vw,13.5px);line-height:1.72;
+  white-space:pre-wrap;overflow-x:auto;color:var(--code-ink);margin:0;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 30px -18px rgba(11,18,32,.5);
+}
+.pcode.tree{white-space:pre}
+.pcode b{color:var(--code-hi);font-weight:500}
+.pcode i{color:var(--code-mute);font-style:normal}
+.pcode u{color:#FFFFFF;text-decoration:none;font-weight:500}
+.pcode .t{color:var(--code-t)}
+.notebox{border-left:2px solid var(--accent);padding-left:16px;margin-top:22px;color:var(--ink-2);font-size:16px;max-width:58ch;line-height:1.55}
+
+/* ---------- about ---------- */
+.about{display:grid;gap:36px;margin-top:4px;align-items:start}
+@media(min-width:840px){.about{grid-template-columns:1fr 1.15fr}}
+.about h2{font-size:clamp(44px,6vw,78px)!important;line-height:.98!important;letter-spacing:-.045em!important}
+.facts{border-top:1px solid var(--ink)}
+.fact{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:13px 0;border-bottom:1px solid var(--line);font-size:16.5px}
+.fact > span:first-child{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+@media(max-width:480px){.fact{grid-template-columns:1fr;gap:2px}}
+
+.counter{
+  position:absolute;right:clamp(14px,3vw,26px);bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-2);
+  background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 11px;
+  z-index:15;font-variant-numeric:tabular-nums;pointer-events:none;
+}
+
+/* ---------- prompt library ---------- */
+.prompts{padding:clamp(24px,4vw,48px) clamp(16px,5vw,48px) 90px}
+.pl-head{max-width:1060px;margin:0 auto 34px}
+.pl-head h2{font-weight:600;font-size:clamp(32px,4.2vw,46px);letter-spacing:-.035em;line-height:1.05}
+.ph-note{font-family:var(--mono);font-size:.82em;color:var(--accent);background:var(--accent-soft);padding:2px 7px;border-radius:5px}
+.rules{display:grid;gap:10px;margin-top:24px;max-width:780px}
+.rule{display:flex;gap:14px;align-items:baseline;font-size:16.5px;color:var(--ink-2)}
+.rule b{color:var(--ink);font-weight:600}
+.rule span{font-family:var(--mono);font-size:12.5px;color:var(--accent);flex:0 0 auto}
+.pl-grid{max-width:1060px;margin:0 auto;display:grid;gap:12px}
+.prompt{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.prompt[open]{border-color:var(--accent-line);box-shadow:0 0 0 3px var(--accent-soft)}
+.prompt>summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;gap:14px}
+.prompt>summary::-webkit-details-marker{display:none}
+.prompt>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.pnum{font-family:var(--mono);font-size:12px;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:6px;flex:0 0 auto}
+.ptitle{font-weight:600;font-size:17px;letter-spacing:-.015em}
+.pwhen{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:auto;text-align:right;display:none}
+@media(min-width:680px){.pwhen{display:block}}
+.pbody{border-top:1px solid var(--line)}
+.pnote{padding:15px 18px;color:var(--ink-2);font-size:15.5px;line-height:1.55}
+.pnote b{color:var(--ink);font-weight:600}
+.pnote code{font-family:var(--mono);font-size:.84em;color:var(--accent);background:var(--accent-soft);padding:1px 6px;border-radius:5px}
+.pwrap{position:relative}
+.prompt pre{
+  margin:0;padding:20px 18px 22px;overflow-x:auto;
+  font-family:var(--mono);font-size:13.5px;line-height:1.72;color:var(--code-ink);
+  background:var(--code);white-space:pre-wrap;word-break:break-word;
+}
+.prompt pre mark{background:rgba(130,182,255,.14);color:var(--code-hi);padding:0 3px;border-radius:4px}
+.copy{
+  position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:var(--code-ink);
+  border-radius:6px;padding:5px 10px;cursor:pointer;
+}
+.copy:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.plabel{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:28px 2px 10px;max-width:1060px;margin:0 auto}
+
+/* ---------- notes ---------- */
+.notes{padding:clamp(24px,4vw,48px) clamp(16px,5vw,48px) 90px}
+.nt{max-width:1060px;margin:0 auto}
+.nt h2{font-weight:600;font-size:clamp(32px,4.2vw,46px);letter-spacing:-.035em;line-height:1.05}
+.nt h3{font-weight:600;font-size:19px;letter-spacing:-.015em;margin:34px 0 12px}
+.nt-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-top:24px}
+.nt label{display:grid;gap:6px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.nt input,.nt select,.nt textarea{
+  font-family:var(--sans);font-size:15.5px;color:var(--ink);background:var(--surface);
+  border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%;min-width:0;
+  text-transform:none;letter-spacing:0;
+}
+.nt input:focus,.nt select:focus,.nt textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.nt select{min-width:240px}
+.nt textarea{min-height:160px;resize:vertical;line-height:1.55}
+.nt-meta{display:grid;gap:12px;margin-top:22px;padding:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+@media(min-width:760px){.nt-meta{grid-template-columns:2fr 1fr 1.5fr auto;align-items:end}}
+.btn{
+  font-weight:500;font-size:14px;letter-spacing:-.005em;
+  border:1px solid var(--line);border-radius:8px;padding:9px 14px;background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap;
+}
+.btn:hover{border-color:var(--dline)}
+.btn.pri{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn.pri:hover{background:var(--pri-hover);border-color:var(--pri-hover)}
+.btn.warn{border-color:var(--bad-line);color:var(--bad)}
+.btn.warn:hover{border-color:var(--bad)}
+.nt-table{display:grid;gap:8px}
+.nt-row{display:grid;gap:8px;align-items:start;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+@media(min-width:900px){.nt-row{grid-template-columns:1fr 1.6fr 1.6fr 1.6fr auto;padding:8px;border-radius:10px}}
+.nt-head{display:none}
+@media(min-width:900px){.nt-head{display:grid;grid-template-columns:1fr 1.6fr 1.6fr 1.6fr 34px;gap:8px;padding:0 10px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}}
+.nt-row textarea{min-height:42px;height:42px}
+.nt-x{width:34px;height:40px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--muted);cursor:pointer;font-size:18px;line-height:1}
+.nt-x:hover{border-color:var(--bad);color:var(--bad)}
+.nt-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;align-items:center}
+.nt-status{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:auto}
+.nt-store{margin-top:14px;color:var(--muted);font-size:14.5px}
+.nt-empty{margin-top:28px;padding:28px;border:1px dashed var(--dline);border-radius:12px;color:var(--ink-2);background:var(--surface)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- diagrams ---------- */
+.dg .bx{fill:var(--surface);stroke:var(--dline);stroke-width:1.25}
+.dg .bxa{fill:var(--accent-soft);stroke:var(--accent-line);stroke-width:1.25}
+.dg .ln{fill:none;stroke:var(--dline);stroke-width:1.5}
+.dg .lna{fill:none;stroke:var(--accent);stroke-width:1.75}
+.dg .dash{fill:none;stroke:var(--dline);stroke-width:1.25;stroke-dasharray:4 4}
+.dg .gt{fill:none;stroke:var(--ink-2);stroke-width:1.25;stroke-dasharray:5 4}
+.dg .gth{fill:none;stroke:var(--ink);stroke-width:3}
+.dg .dot{fill:var(--ink-2);opacity:.35}
+.dg .dota{fill:var(--accent)}
+.dg text{fill:var(--ink);font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:-.01em}
+.dg .sm{font-size:12.5px;fill:var(--ink-2);font-weight:500}
+.dg .mu{font-size:12px;fill:var(--muted);font-weight:400}
+.dg .ac{fill:var(--accent)}
+.dg .tl{fill:var(--cyan)}
+.dg .gd{fill:var(--good)}
+.dg .bd{fill:var(--bad)}
+.dg .hd{font-family:var(--mono);font-size:11.5px;fill:var(--muted);letter-spacing:.14em;font-weight:500}
+.dg .dic{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .flow{stroke-dasharray:6 5}
+
+/* ---------- motion: only on the active slide ---------- */
+@keyframes march{to{stroke-dashoffset:-22}}
+@keyframes gate{0%{stroke:var(--ink-2);stroke-width:1.25}7%{stroke:var(--accent);stroke-width:4}20%,100%{stroke:var(--ink-2);stroke-width:1.25}}
+@keyframes gateH{0%{stroke:var(--ink)}7%{stroke:var(--accent)}20%,100%{stroke:var(--ink)}}
+@keyframes gateT{0%{fill:var(--ink)}7%{fill:var(--accent)}20%,100%{fill:var(--ink)}}
+.slide.on .dg .flow{animation:march 1.4s linear infinite}
+.slide.on .g0,.slide.on .g1,.slide.on .g2,.slide.on .g3{animation:gate 6s infinite}
+.slide.on .g4{animation:gateH 6s infinite}
+.slide.on .l0,.slide.on .l1,.slide.on .l2,.slide.on .l3,.slide.on .l4{animation:gateT 6s infinite}
+.slide.on .g1,.slide.on .l1{animation-delay:.45s}
+.slide.on .g2,.slide.on .l2{animation-delay:.9s}
+.slide.on .g3,.slide.on .l3{animation-delay:1.35s}
+.slide.on .g4,.slide.on .l4{animation-delay:1.8s}
+@media(prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;transition:none!important}
+  .slide.on *{animation:none!important}
+}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Agentic Engineering <span data-i18n="workshop">Workshop</span></div>
+  <div class="chapter" id="chapter"></div>
+  <div class="seg" role="tablist" id="tabs">
+    <button type="button" role="tab" data-view="deck" aria-selected="true" data-i18n="deck">Präsentation</button>
+    <button type="button" role="tab" data-view="prompts" aria-selected="false" data-i18n="prompts">Prompts</button>
+    <button type="button" role="tab" data-view="notes" aria-selected="false" data-i18n="notes" hidden>Notizen</button>
+  </div>
+  <div class="seg" id="langs" role="group" aria-label="Sprache / Language">
+    <button type="button" data-lang="de" aria-pressed="true">DE</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+  <button type="button" class="look" id="look" aria-pressed="false" aria-label="Dunkle Darstellung" title="Dunkle Darstellung"><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" /></svg><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /></svg></button>
+  <div class="rail-track"><div class="rail" id="rail"></div></div>
+</header>
+<main>
+
+<div class="view deck" id="deck-de" tabindex="-1" hidden>
+
+<!-- Titel -->
+<section class="slide title-slide" data-ch="Titel">
+  <div class="inner">
+    <p class="eyebrow">Basis-Workshop · 2 Tage</p>
+    <h1>Agentic&nbsp;Engineering<br>&amp; <span>Spec-driven Development</span></h1>
+    <p class="lede">Zwei Tage Claude Code. Tag 1 am eigenen Projekt, Tag 2 an einer echten Aufgabe aus dem Arbeitsalltag.</p>
+    <div class="meta-row">
+      <span class="chip">Claude Code</span>
+      <span class="chip">Hands-on</span>
+      <span class="chip">Eigenes Notebook, eigene Lizenz</span>
+    </div>
+  </div>
+</section>
+
+<!-- Über mich -->
+<section class="slide" data-ch="Vorstellung">
+  <div class="inner">
+    <p class="eyebrow">Wer hier vorne steht</p>
+    <div class="about">
+      <div>
+        <h2>Daniel<br>Vanella</h2>
+        <p class="lede">Agentic Engineering greifbar machen und in die Breite bringen.</p>
+      </div>
+      <div class="facts">
+        <div class="fact"><span>Firma</span><span>Vanella GmbH &amp; Co. KG</span></div>
+        <div class="fact"><span>Rolle</span><span>Geschäftsführer</span></div>
+        <div class="fact"><span>Hintergrund</span><span>Certified Software Architect · Solution Architect · Agentic Engineer</span></div>
+        <div class="fact"><span>Schwerpunkte</span><span>Java, Kotlin, Spring Boot · Logistik und Intralogistik</span></div>
+        <div class="fact"><span>Mit Agenten</span><span>von Anfang an</span></div>
+        <div class="fact"><span>Projekte</span><span>SAP-Anbindungen · Materialflussrechner · Knowledge Graphs für Systemlandschaften</span></div>
+        <div class="fact"><span>Kontakt</span><span>dv@vanella.gmbh</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Vorstellungsrunde -->
+<section class="slide" data-ch="Vorstellung">
+  <div class="inner">
+    <p class="eyebrow">Vorstellungsrunde</p>
+    <h2>Eine Minute pro Person</h2>
+    <ul class="plain" style="margin-top:30px">
+      <li data-n="→"><span>Woran arbeitest du gerade?</span></li>
+      <li data-n="→"><span>Wie viel Erfahrung hast du mit Coding-Agenten?</span></li>
+      <li data-n="→"><span>Was möchtest du nach diesen zwei Tagen können?</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- Rahmen -->
+<section class="slide" data-ch="Rahmen">
+  <div class="inner">
+    <p class="eyebrow">Der Rahmen</p>
+    <h2>Zwei Tage, zwei Projekte</h2>
+    <div class="cols c2">
+      <div class="card">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /> <path d="M9 18h6" /> <path d="M10 22h4" /></svg></div>
+        <span class="k">Tag 1 · Eigenes Wunschprojekt</span>
+        <h4>Die Grundlagen</h4>
+        <ul>
+          <li>Begriffe: Code-Ergänzung, Vibe Coding, Agentic Engineering</li>
+          <li>Wie ein Agent arbeitet</li>
+          <li>Claude Code bedienen</li>
+          <li>Die Arbeitskette von der Idee bis zum Review</li>
+          <li>Skills aus dem eigenen Vorgehen ableiten</li>
+        </ul>
+      </div>
+      <div class="card hi">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 21V10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v11" /> <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 1.132-1.803l7.95-3.974a2 2 0 0 1 1.837 0l7.948 3.974A2 2 0 0 1 22 8z" /> <path d="M6 13h12" /> <path d="M6 17h12" /></svg></div>
+        <span class="k">Tag 2 · Echte Aufgabe aus dem Arbeitsalltag</span>
+        <h4>Fortgeschrittene Themen</h4>
+        <ul>
+          <li>Architekturanalyse mit ARCHITECTURE.md</li>
+          <li>CLAUDE.md für bestehenden Code</li>
+          <li>Änderungen im Bestand absichern</li>
+          <li>Dokumentation im Abschluss</li>
+          <li>Skills global und im Team nutzen</li>
+          <li>Hooks</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Drei Arbeitsweisen -->
+<section class="slide" data-ch="Begriffe">
+  <div class="inner">
+    <p class="eyebrow">Begriffe</p>
+    <h2>Drei Arbeitsweisen mit KI im Code</h2>
+    <div class="cols c3">
+      <div class="card">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 8h.01" /> <path d="M12 12h.01" /> <path d="M14 8h.01" /> <path d="M16 12h.01" /> <path d="M18 8h.01" /> <path d="M6 8h.01" /> <path d="M7 16h10" /> <path d="M8 12h.01" /> <rect width="20" height="16" x="2" y="4" rx="2" /></svg></div>
+        <h4>KI-Code-Ergänzung</h4>
+        <div class="kv"><span>denkt</span><b>Mensch</b></div>
+        <div class="kv"><span>entscheidet</span><b>Mensch</b></div>
+        <div class="kv"><span>taugt für</span><b>Zeilen, Boilerplate</b></div>
+        <p class="after">Der Editor schlägt die nächste Zeile vor. Du nimmst sie an oder nicht.</p>
+      </div>
+      <div class="card">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /> <path d="M20 2v4" /> <path d="M22 4h-4" /> <circle cx="4" cy="20" r="2" /></svg></div>
+        <h4>Vibe Coding</h4>
+        <div class="kv"><span>denkt</span><b>KI</b></div>
+        <div class="kv"><span>entscheidet</span><b class="bad">KI</b></div>
+        <div class="kv"><span>taugt für</span><b>Prototypen, Wegwerfcode</b></div>
+        <p class="after">Du beschreibst, was du willst, und schaust dir das Ergebnis an. Den Code liest du kaum.</p>
+      </div>
+      <div class="card hi">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="3" /> <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" /> <circle cx="18" cy="5" r="3" /></svg></div>
+        <h4>Agentic Engineering</h4>
+        <div class="kv"><span>denkt</span><b>KI</b></div>
+        <div class="kv"><span>entscheidet</span><b class="acc">Mensch</b></div>
+        <div class="kv"><span>taugt für</span><b class="acc">Produktivcode</b></div>
+        <p class="after">Der Agent arbeitet selbstständig, innerhalb von Regeln, Spec und Prüfungen, die du festlegst.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Statement -->
+<section class="slide" data-ch="Begriffe">
+  <div class="inner">
+    <p class="statement">Agentic Engineering heißt: den Handlungsspielraum des Agenten <span>eingrenzen</span> und ihn Schritt für Schritt führen.</p>
+    <p class="attrib">Dafür braucht es zuerst ein Bild davon, wie ein Agent arbeitet.</p>
+  </div>
+</section>
+
+<!-- ReAct -->
+<section class="slide" data-ch="Wie Agenten arbeiten">
+  <div class="inner">
+    <p class="eyebrow">Wie Agenten arbeiten</p>
+    <h2>Der ReAct-Zyklus</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 214" role="img" aria-label="Der Agent überlegt den nächsten Schritt, setzt ihn um, beobachtet das Ergebnis und beginnt von vorn, bis das Ziel erreicht ist">
+        <defs><marker id="de-m-a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker>
+        <marker id="de-m-aa" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker></defs>
+        <rect x="40" y="16" width="180" height="104" rx="8" class="bx"/>
+        <g class="dic" transform="translate(115 28) scale(1.25)"><path d="M12 18V5" /> <path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4" /> <path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5" /> <path d="M17.997 5.125a4 4 0 0 1 2.526 5.77" /> <path d="M18 18a4 4 0 0 0 2-7.464" /> <path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517" /> <path d="M6 18a4 4 0 0 1-2-7.464" /> <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77" /></g>
+        <text x="130" y="86" text-anchor="middle">Reason</text>
+        <text x="130" y="106" text-anchor="middle" class="mu">Was ist der nächste Schritt?</text>
+        <line x1="220" y1="68" x2="298" y2="68" class="ln flow" marker-end="url(#de-m-a)"/>
+        <rect x="300" y="16" width="180" height="104" rx="8" class="bx"/>
+        <g class="dic" transform="translate(375 28) scale(1.25)"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" /></g>
+        <text x="390" y="86" text-anchor="middle">Act</text>
+        <text x="390" y="106" text-anchor="middle" class="mu">setzt den Schritt um</text>
+        <line x1="480" y1="68" x2="558" y2="68" class="ln flow" marker-end="url(#de-m-a)"/>
+        <rect x="560" y="16" width="180" height="104" rx="8" class="bx"/>
+        <g class="dic" transform="translate(635 28) scale(1.25)"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /> <circle cx="12" cy="12" r="3" /></g>
+        <text x="650" y="86" text-anchor="middle">Observe</text>
+        <text x="650" y="106" text-anchor="middle" class="mu">Was kam dabei heraus?</text>
+        <path d="M650 120 L650 170 L130 170 L130 122" class="ln flow" marker-end="url(#de-m-a)"/>
+        <text x="390" y="198" text-anchor="middle" class="mu">… bis das Ziel erreicht ist</text>
+        <line x1="740" y1="68" x2="806" y2="68" class="lna" marker-end="url(#de-m-aa)"/>
+        <text x="855" y="73" text-anchor="middle" class="ac">Ergebnis</text>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<!-- Kontextfenster -->
+<section class="slide" data-ch="Wie Agenten arbeiten">
+  <div class="inner">
+    <p class="eyebrow">Wie Agenten arbeiten</p>
+    <h2>Das Kontextfenster verbraucht sich im Lauf einer Sitzung.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 222" role="img" aria-label="Vor der Kompaktierung enthält das Kontextfenster Systemprompt, CLAUDE.md und einen langen Verlauf. Bei der Kompaktierung wird nur der Verlauf zusammengefasst; Systemprompt und CLAUDE.md bleiben vollständig geladen">
+        <text x="0" y="16" class="hd">VOR DER KOMPAKTIERUNG</text>
+        <rect x="0" y="28" width="900" height="52" rx="7" class="bx"/>
+        <rect x="1.5" y="29.5" width="148.5" height="49" rx="6" fill="var(--flow-soft)"/>
+        <rect x="152" y="29.5" width="128" height="49" fill="var(--signal-soft)"/>
+        <rect x="282" y="29.5" width="498" height="49" fill="var(--surface-2)"/>
+        <text x="75" y="50" text-anchor="middle" class="sm tl">Systemprompt</text>
+        <text x="75" y="66" text-anchor="middle" class="mu">Verhalten · Werkzeuge</text>
+        <text x="216" y="58" text-anchor="middle" class="sm ac">CLAUDE.md</text>
+        <text x="531" y="50" text-anchor="middle" class="sm">Verlauf</text>
+        <text x="531" y="66" text-anchor="middle" class="mu">Nachrichten · Werkzeugaufrufe · Dateiinhalte · Ausgaben</text>
+        <text x="841" y="58" text-anchor="middle" class="mu">frei</text>
+        <path d="M2 88 V96 H278 V88" class="ln"/>
+        <text x="140" y="112" text-anchor="middle" class="mu">bleibt geladen</text>
+        <path d="M284 88 V96 H778 V88" class="lna"/>
+        <text x="531" y="112" text-anchor="middle" class="sm ac">wird zusammengefasst, wenn das Fenster voll ist</text>
+        <path d="M531 118 L341 158" class="dash"/>
+        <text x="0" y="150" class="hd">DANACH</text>
+        <rect x="0" y="162" width="900" height="52" rx="7" class="bx"/>
+        <rect x="1.5" y="163.5" width="148.5" height="49" rx="6" fill="var(--flow-soft)"/>
+        <rect x="152" y="163.5" width="128" height="49" fill="var(--signal-soft)"/>
+        <rect x="282" y="163.5" width="118" height="49" fill="var(--surface-2)"/>
+        <text x="75" y="192" text-anchor="middle" class="sm tl">Systemprompt</text>
+        <text x="216" y="192" text-anchor="middle" class="sm ac">CLAUDE.md</text>
+        <text x="341" y="192" text-anchor="middle" class="sm">Zusammenfassung</text>
+        <text x="651" y="192" text-anchor="middle" class="mu">frei</text>
+      </svg>
+      <figcaption>Vom Verlauf bleibt nur eine Zusammenfassung. Einzelheiten vom Anfang, etwa eine genaue Fehlermeldung oder eine frühe Entscheidung, fehlen danach. /context zeigt die aktuelle Belegung.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Raten -->
+<section class="slide" data-ch="Wie Agenten arbeiten">
+  <div class="inner">
+    <p class="eyebrow">Die Kernursache</p>
+    <h2>Fehlt eine Information, füllt der Agent die Lücke selbst.</h2>
+    <div class="cols c3">
+      <div class="card"><div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /> <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /> <path d="M12 17h.01" /></svg></div><span class="k">Erwartung</span><p>„Er wird schon fragen, wenn etwas unklar ist."</p></div>
+      <div class="card"><div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="12" height="12" x="2" y="10" rx="2" ry="2" /> <path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6" /> <path d="M6 18h.01" /> <path d="M10 14h.01" /> <path d="M15 6h.01" /> <path d="M18 9h.01" /></svg></div><span class="k">Verhalten</span><p>Die Lücke wird mit der wahrscheinlichsten Annahme gefüllt. Lautlos, ohne Hinweis.</p></div>
+      <div class="card hi"><div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /> <path d="M12 9v4" /> <path d="M12 17h.01" /></svg></div><span class="k">Folge</span><p>Die meisten Fehlschläge sind geratene Annahmen.</p></div>
+    </div>
+    <p class="notebox">Deshalb steht in fast jedem Prompt dieser Sammlung dieselbe Zeile: <span class="tiny">Rate nichts. Frag mich.</span></p>
+  </div>
+</section>
+
+<!-- Stochastik -->
+<section class="slide" data-ch="Wie Agenten arbeiten">
+  <div class="inner">
+    <p class="eyebrow">Stochastik</p>
+    <h2>Gleicher Prompt, gleiches Repo, drei Ergebnisse.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 230" role="img" aria-label="Ein identischer Prompt erzeugt in drei Durchläufen drei unterschiedliche Ergebnisse">
+        <defs><marker id="de-m-s" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker></defs>
+        <rect x="0" y="82" width="230" height="62" rx="8" class="bxa"/>
+        <text x="115" y="110" text-anchor="middle" class="ac">ein Prompt</text>
+        <text x="115" y="130" text-anchor="middle" class="mu">unverändert, 3×</text>
+        <path d="M230 113 L300 113 L300 42 L358 42" class="ln flow" marker-end="url(#de-m-s)"/>
+        <path d="M230 113 L358 113" class="ln flow" marker-end="url(#de-m-s)"/>
+        <path d="M230 113 L300 113 L300 184 L358 184" class="ln flow" marker-end="url(#de-m-s)"/>
+        <rect x="360" y="18" width="540" height="48" rx="7" class="bx"/>
+        <text x="380" y="47" class="sm">Struktur A · 4 Dateien · eigene Fehlerklasse</text>
+        <rect x="360" y="89" width="540" height="48" rx="7" class="bx"/>
+        <text x="380" y="118" class="sm">Struktur B · 2 Dateien · Exception durchgereicht</text>
+        <rect x="360" y="160" width="540" height="48" rx="7" class="bx"/>
+        <text x="380" y="189" class="sm">Struktur C · 3 Dateien · anderes Testframework</text>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<!-- Leitfrage -->
+<section class="slide" data-ch="Leitfrage">
+  <div class="inner">
+    <p class="eyebrow">Die Frage, die zwei Tage an der Wand hängt</p>
+    <p class="statement">Wie macht man Arbeit mit einem <span>stochastischen</span> Werkzeug verlässlich?</p>
+    <p class="attrib">Nach jedem Block kommt eine Antwort dazu.</p>
+  </div>
+</section>
+
+<!-- Trichter -->
+<section class="slide" data-ch="Das Modell">
+  <div class="inner">
+    <p class="eyebrow">Die Antwort in einem Bild</p>
+    <h2>Fünf Dinge grenzen den Spielraum ein.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 285" role="img" aria-label="Ein Trichter: Der Handlungsspielraum des Agenten wird nacheinander durch CLAUDE.md, brainstorming.md, spec.md, progress.md und Hooks eingegrenzt, bis das Ergebnis eng bestimmt ist">
+        <text x="0" y="16" class="hd">HANDLUNGSSPIELRAUM DES AGENTEN</text>
+        <polygon points="0,30 860,115 860,145 0,230" class="bx"/>
+        <circle cx="28" cy="62" r="3.5" class="dot"/><circle cx="52" cy="150" r="3.5" class="dot"/>
+        <circle cx="38" cy="198" r="3.5" class="dot"/><circle cx="82" cy="96" r="3.5" class="dot"/>
+        <circle cx="96" cy="178" r="3.5" class="dot"/><circle cx="20" cy="122" r="3.5" class="dot"/>
+        <circle cx="112" cy="130" r="3.5" class="dot"/><circle cx="70" cy="58" r="3.5" class="dot"/>
+        <line x1="150" y1="45" x2="150" y2="215" class="gt g0"/>
+        <line x1="300" y1="60" x2="300" y2="200" class="gt g1"/>
+        <line x1="450" y1="75" x2="450" y2="185" class="gt g2"/>
+        <line x1="600" y1="90" x2="600" y2="170" class="gt g3"/>
+        <line x1="750" y1="104" x2="750" y2="156" class="gth g4"/>
+        <circle cx="880" cy="124" r="3.5" class="dota"/><circle cx="880" cy="130" r="3.5" class="dota"/><circle cx="880" cy="136" r="3.5" class="dota"/>
+        <text x="898" y="106" text-anchor="end" class="ac sm">Ergebnis</text>
+        <text x="150" y="254" text-anchor="middle" class="l0">CLAUDE.md</text><text x="150" y="272" text-anchor="middle" class="mu">Regeln</text>
+        <text x="300" y="254" text-anchor="middle" class="l1">brainstorming.md</text><text x="300" y="272" text-anchor="middle" class="mu">Entscheidung</text>
+        <text x="450" y="254" text-anchor="middle" class="l2">spec.md</text><text x="450" y="272" text-anchor="middle" class="mu">Was &amp; Warum</text>
+        <text x="600" y="254" text-anchor="middle" class="l3">progress.md</text><text x="600" y="272" text-anchor="middle" class="mu">Plan · Tests · Review</text>
+        <text x="750" y="254" text-anchor="middle" class="l4">Hooks</text><text x="750" y="272" text-anchor="middle" class="mu">technisch erzwungen</text>
+      </svg>
+      <figcaption>Gestrichelt: Dateien, die der Agent liest und meistens befolgt. Durchgezogen: Hooks, die Claude Code bei jedem Mal ausführt. Je enger der Raum, desto näher liegen drei Durchläufe beieinander.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Die Kette -->
+<section class="slide" data-ch="Die Kette">
+  <div class="inner">
+    <p class="eyebrow">Die Arbeitskette</p>
+    <h2>Pro Feature derselbe Weg.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 340" role="img" aria-label="Eine Idee über features.md oder ein Ticket führt zu einem Feature; das Feature durchläuft brainstorming.md, spec.md, progress.md, Review und Abschluss; Review-Befunde gehen zurück in progress.md; aus dem Abschluss werden Erkenntnisse in CLAUDE.md, Skills, Hooks und ARCHITECTURE.md zurückgeführt, die wiederum bei jedem Schritt gelten">
+        <defs><marker id="de-m-k" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker>
+        <marker id="de-m-ka" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker></defs>
+        <text x="0" y="16" class="hd">EINSTIEG</text>
+        <rect x="0" y="28" width="300" height="50" rx="8" class="bx"/>
+        <text x="20" y="50" class="sm">Tag 1 · eigene Idee</text>
+        <text x="20" y="68" class="mu">→ features.md</text>
+        <rect x="320" y="28" width="220" height="50" rx="8" class="bx"/>
+        <text x="340" y="50" class="sm">Tag 2 · Ticket</text>
+        <text x="340" y="68" class="mu">ist bereits ein Feature</text>
+        <text x="560" y="58" class="mu">beides führt zu genau einem Feature</text>
+        <path d="M430 78 V100 H150" class="ln"/>
+        <path d="M150 78 V100 H80 V124" class="ln" marker-end="url(#de-m-k)"/>
+        <text x="200" y="118" class="hd">PRO FEATURE</text>
+        <rect x="0" y="128" width="156" height="64" rx="8" class="bxa"/>
+        <text x="78" y="156" text-anchor="middle" class="ac">brainstorming.md</text>
+        <text x="78" y="176" text-anchor="middle" class="mu">in mehreren Runden</text>
+        <line x1="156" y1="160" x2="184" y2="160" class="ln" marker-end="url(#de-m-k)"/>
+        <rect x="186" y="128" width="156" height="64" rx="8" class="bxa"/>
+        <text x="264" y="156" text-anchor="middle" class="ac">spec.md</text>
+        <text x="264" y="176" text-anchor="middle" class="mu">Was · Warum</text>
+        <line x1="342" y1="160" x2="370" y2="160" class="ln" marker-end="url(#de-m-k)"/>
+        <rect x="372" y="128" width="156" height="64" rx="8" class="bxa"/>
+        <text x="450" y="156" text-anchor="middle" class="ac">progress.md</text>
+        <text x="450" y="176" text-anchor="middle" class="mu">Plan · Code · Tests</text>
+        <line x1="528" y1="160" x2="556" y2="160" class="ln" marker-end="url(#de-m-k)"/>
+        <rect x="558" y="128" width="156" height="64" rx="8" class="bx"/>
+        <text x="636" y="156" text-anchor="middle">Review</text>
+        <text x="636" y="176" text-anchor="middle" class="mu">neue Sitzung</text>
+        <line x1="714" y1="160" x2="742" y2="160" class="ln" marker-end="url(#de-m-k)"/>
+        <rect x="744" y="128" width="156" height="64" rx="8" class="bx"/>
+        <text x="822" y="156" text-anchor="middle">Abschluss</text>
+        <text x="822" y="176" text-anchor="middle" class="mu">PR · Doku · done/</text>
+        <path d="M636 128 V112 H450 V124" class="dash" marker-end="url(#de-m-k)"/>
+        <text x="543" y="107" text-anchor="middle" class="mu">Befunde beheben</text>
+        <rect x="0" y="268" width="900" height="58" rx="8" class="bx"/>
+        <text x="24" y="292" class="ac">CLAUDE.md / AGENTS.md</text>
+        <text x="250" y="292" class="ac">Skills</text>
+        <text x="360" y="292" class="ac">Hooks</text>
+        <text x="470" y="292" class="ac">ARCHITECTURE.md</text>
+        <text x="24" y="313" class="mu">Projektwissen, gilt bei jedem Schritt und wächst mit jedem Feature</text>
+        <path d="M80 266 V196" class="ln flow" marker-end="url(#de-m-k)"/>
+        <text x="92" y="236" class="mu">gilt bei jedem Schritt</text>
+        <path d="M822 194 V264" class="lna flow" marker-end="url(#de-m-ka)"/>
+        <text x="810" y="236" text-anchor="end" class="sm ac">Erkenntnisse zurückführen</text>
+      </svg>
+      <figcaption>Ein Ordner pro Feature unter specs/open/. Nach dem Abschluss wandert er nach specs/done/.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Struktur -->
+<section class="slide" data-ch="Die Kette">
+  <div class="inner">
+    <p class="eyebrow">Wo die Dateien liegen</p>
+    <h2>Ein Ordner pro Feature.</h2>
+    <div class="split tl">
+      <div>
+        <pre class="pcode tree">mein-projekt/
+├── <b>CLAUDE.md</b>          <i>Regeln, Konventionen</i>
+├── <b>ARCHITECTURE.md</b>    <i>Gesamtbild des Systems</i>
+├── features.md        <i>Tag 1: Liste der Features</i>
+├── .claude/
+│   ├── settings.json  <i>Hooks</i>
+│   └── skills/        <i>Projekt-Skills</i>
+└── specs/
+    ├── open/
+    │   └── <b>csv-export/</b>
+    │       ├── brainstorming.md
+    │       ├── spec.md
+    │       └── progress.md
+    └── done/          <i>abgeschlossene Features</i></pre>
+      </div>
+      <div>
+        <ul class="plain" style="margin-top:0">
+          <li data-n="→"><span>Der Agent bekommt <b>einen Pfad</b> und hat alles zu diesem Feature.</span></li>
+          <li data-n="→"><span><b>done/</b> hält Abgeschlossenes aus dem Blickfeld. In der CLAUDE.md steht, dass dieser Ordner nur auf Nachfrage gelesen wird.</span></li>
+          <li data-n="→"><span>An Tag 2 heißt der Ordner nach dem Ticket, etwa <b>PROJ-123-csv-export/</b>. Der Ticket-Text steht als Ausgangslage oben in der brainstorming.md.</span></li>
+          <li data-n="→"><span><b>ARCHITECTURE.md</b> liegt im Wurzelverzeichnis und wird im Abschluss jedes Features geprüft.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- features.md -->
+<section class="slide" data-ch="Die Kette">
+  <div class="inner">
+    <p class="eyebrow">Schritt 1 · features.md</p>
+    <h2>Die Idee schildern, der Agent leitet die Features ab.</h2>
+    <div class="split">
+      <div>
+        <p class="lede" style="margin-top:0">Auch die Features, die in der Idee stecken, ohne dass man sie ausdrücklich genannt hat: Anmeldung, Datenhaltung, Export, Fehlerfälle.</p>
+        <p class="notebox"><code>features.md</code> ist die gemeinsame Referenz, bis zu jedem Feature eine Spec existiert. Danach kann sie gelöscht werden. An Tag 2 übernimmt das Ticket diese Rolle.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 01</span>
+        <pre class="pcode">Hier ist meine Projektidee:
+<b>{{Beschreibung, so ausführlich wie möglich}}</b>
+
+Leite daraus die Features ab, die diese Idee
+voraussetzt, auch die, die ich nicht ausdrücklich
+genannt habe. Schreib sie in eine features.md:
+
+<u>- pro Feature ein Satz, was es kann
+- Reihenfolge: was zuerst da sein muss
+- was für eine erste lauffähige Version
+  wegfallen kann</u>
+
+<b>Stell mir zuerst die Fragen, die du dafür
+brauchst. Noch keine Spec, noch kein Code.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLAUDE.md -->
+<section class="slide" data-ch="Die Kette">
+  <div class="inner">
+    <p class="eyebrow">Schritt 2 · CLAUDE.md</p>
+    <h2>Was in jeder Sitzung gilt, steht in einer Datei.</h2>
+    <div class="split">
+      <div>
+        <p class="lede" style="margin-top:0">Sprache, Struktur, Konventionen, Testframework, verbotene Wege. Alles, was der Agent sonst in jeder neuen Sitzung von vorn erraten müsste.</p>
+        <p class="notebox">Andere Agenten-Werkzeuge nutzen dafür eine <code>AGENTS.md</code>. Inhalt und Zweck sind dieselben.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 02</span>
+        <pre class="pcode">Lass uns eine CLAUDE.md erstellen, die festhält,
+was du beim Arbeiten in diesem Projekt jedes Mal
+wissen musst. Grundlage ist die features.md.
+
+Schlag mir vor:
+<u>- Sprache, Framework, Testframework,
+  wie man startet und testet
+- Ordnerstruktur, inklusive specs/open/ und
+  specs/done/ (done/ nur auf Nachfrage lesen)
+- Namenskonventionen und Fehlerbehandlung
+- Was nie getan werden soll</u>
+
+<b>Frag mich, bevor du etwas festschreibst.
+Kurze Anweisungen, keine Prosa.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- brainstorming -->
+<section class="slide" data-ch="Die Kette">
+  <div class="inner">
+    <p class="eyebrow">Schritt 3 · brainstorming.md</p>
+    <h2>Brainstorming in mehreren Runden</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 206" role="img" aria-label="Agent und Mensch arbeiten in mehreren Runden an brainstorming.md, bis keine Frage mehr offen ist; erst dann entsteht spec.md">
+            <defs><marker id="de-m-b" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker>
+            <marker id="de-m-ba" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker></defs>
+            <rect x="0" y="20" width="190" height="56" rx="8" class="bxa"/>
+            <text x="95" y="44" text-anchor="middle" class="ac sm">brainstorming.md</text>
+            <text x="95" y="62" text-anchor="middle" class="mu">Optionen · Empfehlung</text>
+            <rect x="240" y="20" width="190" height="56" rx="8" class="bx"/>
+            <text x="335" y="44" text-anchor="middle" class="sm">Mensch</text>
+            <text x="335" y="62" text-anchor="middle" class="mu">wählt aus, beantwortet</text>
+            <path d="M190 38 H236" class="ln" marker-end="url(#de-m-b)"/>
+            <path d="M240 58 H194" class="ln" marker-end="url(#de-m-b)"/>
+            <text x="215" y="12" text-anchor="middle" class="mu">Runde 1, 2, 3 …</text>
+            <path d="M95 76 V140" class="lna" marker-end="url(#de-m-ba)"/>
+            <text x="107" y="114" class="gd sm">keine Frage mehr offen</text>
+            <rect x="0" y="144" width="190" height="52" rx="8" class="bxa"/>
+            <text x="95" y="175" text-anchor="middle" class="ac sm">spec.md</text>
+          </svg>
+        </figure>
+        <p class="notebox">Der Agent schlägt eine Lösung vor, der Mensch wählt aus und beantwortet die Fragen direkt in der Datei. Danach passt der Agent Optionen und Empfehlung an.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 03</span>
+        <pre class="pcode">Wir bereiten dieses Feature vor:
+<b>{{Feature-Beschreibung oder Ticket-Text}}</b>
+
+Schreib specs/open/<b>{{feature}}</b>/brainstorming.md mit
+<u>- Ausgangslage (die Beschreibung von oben)
+- Lösungsoptionen mit Vor- und Nachteilen
+- deiner Empfehlung mit Begründung
+- Risiken
+- offenen Fragen an mich</u>
+
+Wir gehen das in mehreren Runden durch: Ich
+markiere meine Auswahl und beantworte die Fragen
+in der Datei, du passt daraufhin Optionen und
+Empfehlung an. Bis keine Frage mehr offen ist.
+
+<b>Noch keine Spec, noch kein Code.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- spec -->
+<section class="slide" data-ch="Die Kette">
+  <div class="inner">
+    <p class="eyebrow">Schritt 4 · spec.md</p>
+    <h2>Anatomie einer Spec</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 240" role="img" aria-label="Eine Spec besteht aus Intent, Scope, Non-Goals, nummerierten Akzeptanzkriterien und Constraints">
+            <rect x="0" y="6" width="430" height="226" rx="9" class="bx"/>
+            <text x="20" y="38" class="ac">Intent</text><text x="170" y="38" class="mu">Warum gibt es das?</text>
+            <line x1="20" y1="50" x2="410" y2="50" class="dash"/>
+            <text x="20" y="78" class="ac">Scope</text><text x="170" y="78" class="mu">Was ist enthalten?</text>
+            <line x1="20" y1="90" x2="410" y2="90" class="dash"/>
+            <text x="20" y="118" class="ac">Non-Goals</text><text x="170" y="118" class="mu">Was ausdrücklich nicht?</text>
+            <line x1="20" y1="130" x2="410" y2="130" class="dash"/>
+            <text x="20" y="158" class="ac">Akzeptanzkriterien</text>
+            <text x="20" y="178" class="mu">nummeriert · einzeln überprüfbar · beobachtbares Verhalten</text>
+            <line x1="20" y1="190" x2="410" y2="190" class="dash"/>
+            <text x="20" y="218" class="ac">Constraints</text><text x="170" y="218" class="mu">Welche Grenzen gelten?</text>
+          </svg>
+        </figure>
+        <p class="notebox">Offene Fragen gehören nicht in die Spec. Sie werden im Brainstorming geklärt. Erst wenn dort keine mehr offen ist, entsteht die Spec.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 04</span>
+        <pre class="pcode">Prüfe zuerst, ob in brainstorming.md noch Fragen
+offen sind. Wenn ja: nenne sie und hör auf.
+
+Sonst erzeuge spec.md im selben Ordner:
+<u>- Intent: Warum gibt es das?
+- Scope: Was ist enthalten?
+- Non-Goals: Was ausdrücklich nicht?
+- Akzeptanzkriterien: nummeriert, einzeln
+  überprüfbar, als beobachtbares Verhalten
+- Constraints: technische und fachliche Grenzen</u>
+
+Beschreibe das Was und Warum, nie das Wie.
+Wenn ein Akzeptanzkriterium nicht objektiv
+überprüfbar ist, schreib es um.
+
+<b>Noch kein Code.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Skills -->
+<section class="slide" data-ch="Skills">
+  <div class="inner">
+    <p class="eyebrow">Schritt 5 · Skills ableiten</p>
+    <h2>Der Agent liest das Vorgehen aus deinen eigenen Dateien.</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 150" role="img" aria-label="Aus brainstorming.md und spec.md rekonstruiert der Agent das Vorgehen und legt es als Skill ab; beim nächsten Mal ist die Eingabe ein Eintrag aus features.md oder ein Ticket">
+            <defs><marker id="de-m-sk" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker>
+            <marker id="de-m-sk2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker></defs>
+            <rect x="0" y="10" width="170" height="36" rx="7" class="bx"/><text x="85" y="33" text-anchor="middle" class="sm">brainstorming.md</text>
+            <rect x="0" y="54" width="170" height="36" rx="7" class="bx"/><text x="85" y="77" text-anchor="middle" class="sm">spec.md</text>
+            <path d="M170 50 H226" class="lna" marker-end="url(#de-m-sk)"/>
+            <rect x="230" y="18" width="200" height="64" rx="8" class="bxa"/>
+            <text x="330" y="46" text-anchor="middle" class="ac sm">ein Skill</text>
+            <text x="330" y="66" text-anchor="middle" class="mu">.claude/skills/</text>
+            <path d="M330 110 V86" class="dash" marker-end="url(#de-m-sk2)"/>
+            <text x="330" y="126" text-anchor="middle" class="mu">Eingabe beim nächsten Mal:</text>
+            <text x="330" y="144" text-anchor="middle" class="sm">features.md oder ein Ticket</text>
+          </svg>
+        </figure>
+        <p class="notebox">Der Skill beginnt beim Brainstorming. Was davor kommt, ist austauschbar: an Tag 1 ein Eintrag aus der features.md, an Tag 2 ein Ticket.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 05</span>
+        <pre class="pcode">Wir sind für Feature <b>{{feature}}</b> diesen Weg
+gegangen: brainstorming.md in mehreren Runden,
+danach spec.md.
+
+Lies beide Dateien und rekonstruiere daraus das
+Vorgehen: welche Schritte, welche Rückfragen an
+mich, welche Struktur im Ergebnis.
+
+Leg daraus einen Skill unter
+.claude/skills/<b>{{name}}</b>/SKILL.md an. Eingabe des
+Skills ist eine Feature-Beschreibung, egal ob aus
+der features.md oder aus einem Ticket.
+
+<b>Stütz dich auf die Dateien, nicht auf dein
+Gedächtnis an unsere Unterhaltung.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Umsetzung -->
+<section class="slide" data-ch="Umsetzung">
+  <div class="inner">
+    <p class="eyebrow">Schritt 6 · Umsetzung</p>
+    <h2>Erst der Plan in progress.md, dann der Code.</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 190" role="img" aria-label="Über zwei Sitzungen hinweg geht der Chatkontext verloren, während progress.md den Arbeitsstand weiterträgt">
+            <text x="0" y="14" class="hd">SITZUNG 1</text>
+            <text x="250" y="14" class="hd">SITZUNG 2</text>
+            <rect x="0" y="26" width="170" height="44" rx="7" class="bx"/>
+            <text x="85" y="53" text-anchor="middle" class="sm">Kontextfenster</text>
+            <rect x="250" y="26" width="180" height="44" rx="7" class="bx"/>
+            <text x="340" y="53" text-anchor="middle" class="mu">leer</text>
+            <path d="M170 48 H240" class="dash"/>
+            <text x="205" y="40" text-anchor="middle" class="bd sm">✕</text>
+            <rect x="0" y="96" width="170" height="44" rx="7" class="bxa"/>
+            <text x="85" y="123" text-anchor="middle" class="ac sm">progress.md</text>
+            <rect x="250" y="96" width="180" height="44" rx="7" class="bxa"/>
+            <text x="340" y="123" text-anchor="middle" class="ac sm">unverändert da</text>
+            <path d="M170 118 H240" class="lna"/>
+            <text x="0" y="172" class="mu">Plan · erledigte Schritte · Entscheidungen · Offenes</text>
+          </svg>
+        </figure>
+        <p class="notebox"><code>spec.md</code> bleibt unverändert und ist der Maßstab im Review. <code>progress.md</code> ändert sich laufend. Wer den Plan vor dem ersten Code lesen will, startet im Plan Mode.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 06</span>
+        <pre class="pcode">Setze specs/open/<b>{{feature}}</b>/spec.md um.
+
+Schreib zuerst einen Plan als Checkliste in
+progress.md:
+<u>- Schritte in Reihenfolge
+- zu jedem Schritt das Akzeptanzkriterium,
+  das er erfüllt, und wie er getestet wird
+- Abschnitte "Entscheidungen", "Offene Punkte"
+  und "Review"</u>
+
+Dann arbeite die Checkliste ab. Nach jedem
+Schritt: Tests laufen lassen, abhaken,
+Entscheidungen notieren.
+
+<b>Fehlt dir etwas: nicht raten. Unter
+"Offene Punkte" notieren und mich fragen.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Review -->
+<section class="slide" data-ch="Review">
+  <div class="inner">
+    <p class="eyebrow">Schritt 7 · Review</p>
+    <h2>Review in einer neuen Sitzung, in drei Stufen.</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 300" role="img" aria-label="Review in drei Stufen: Zuerst laufen die Tests; schlagen sie fehl, bricht das Review ab. Sonst folgen die Prüfung gegen die Spec und die technische Qualität; die Befunde landen in progress.md">
+            <defs><marker id="de-m-rv" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker>
+            <marker id="de-m-rva" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker></defs>
+            <rect x="0" y="10" width="250" height="50" rx="8" class="bxa"/>
+            <text x="20" y="32" class="ac sm">1 · Tests</text>
+            <text x="20" y="49" class="mu">im Alltag + Linter, trivy …</text>
+            <path d="M250 35 H296" class="ln" marker-end="url(#de-m-rv)"/>
+            <text x="273" y="27" text-anchor="middle" class="bd sm">rot</text>
+            <rect x="300" y="10" width="130" height="50" rx="8" class="bx"/>
+            <text x="365" y="32" text-anchor="middle" class="bd sm">Abbruch</text>
+            <text x="365" y="49" text-anchor="middle" class="mu">nur das melden</text>
+            <path d="M125 60 V86" class="ln" marker-end="url(#de-m-rv)"/>
+            <text x="137" y="78" class="gd sm">grün</text>
+            <rect x="0" y="90" width="250" height="50" rx="8" class="bx"/>
+            <text x="20" y="112" class="sm">2 · Spec</text>
+            <text x="20" y="129" class="mu">Kriterien erfüllt? Non-Goals?</text>
+            <path d="M125 140 V166" class="ln" marker-end="url(#de-m-rv)"/>
+            <rect x="0" y="170" width="250" height="50" rx="8" class="bx"/>
+            <text x="20" y="192" class="sm">3 · Technische Qualität</text>
+            <text x="20" y="209" class="mu">SOLID · DRY</text>
+            <path d="M125 220 V246" class="lna" marker-end="url(#de-m-rva)"/>
+            <rect x="0" y="250" width="250" height="42" rx="8" class="bxa"/>
+            <text x="20" y="276" class="ac sm">Befunde → progress.md</text>
+          </svg>
+        </figure>
+        <p class="notebox">Die neue Sitzung ist Absicht: Der Agent, der den Code geschrieben hat, prüft gegen sein eigenes Verständnis. Ein frischer Agent prüft gegen die Spec.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 07 · in einer neuen Sitzung</span>
+        <pre class="pcode">Prüfe specs/open/<b>{{feature}}</b>/ gegen die
+spec.md. Du hast den Code nicht geschrieben.
+
+<u>1. Lass die Tests laufen. Schlagen sie fehl,
+   brich ab und melde nur das.
+2. Geh jedes Akzeptanzkriterium durch: Ist es
+   erfüllt, und woran erkennst du das? Was du
+   nicht nachweisen kannst, ist ein Befund.
+   Wurde etwas gebaut, das nicht in der Spec
+   steht, oder ein Non-Goal verletzt?
+3. Prüfe gegen SOLID und DRY. Melde nur
+   konkrete Verstöße mit Begründung.</u>
+
+<b>Schreib die Befunde als Checkliste unter
+"Review" in progress.md. Ändere noch nichts.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Grüner Test -->
+<section class="slide" data-ch="Review">
+  <div class="inner">
+    <p class="eyebrow">Warum ein frischer Agent prüft</p>
+    <h2>Ein grüner Test, der am Kriterium vorbeiprüft.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 236" role="img" aria-label="In derselben Sitzung prüft der Test nur den Code und ist grün. In einer neuen Sitzung liest ein frischer Agent Spec und Code und findet ein nicht erfülltes Kriterium">
+        <defs><marker id="de-m-g" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker>
+        <marker id="de-m-ga" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker></defs>
+        <text x="0" y="16" class="hd">DIESELBE SITZUNG</text>
+        <rect x="0" y="28" width="160" height="50" rx="8" class="bx"/>
+        <text x="80" y="58" text-anchor="middle" class="sm">Code</text>
+        <rect x="200" y="28" width="160" height="50" rx="8" class="bx"/>
+        <text x="280" y="58" text-anchor="middle" class="sm">Test</text>
+        <path d="M200 53 H166" class="ln" marker-end="url(#de-m-g)"/>
+        <text x="180" y="44" text-anchor="middle" class="mu">prüft</text>
+        <path d="M360 53 H416" class="ln" marker-end="url(#de-m-g)"/>
+        <rect x="420" y="28" width="220" height="50" rx="8" class="bx"/>
+        <text x="530" y="58" text-anchor="middle" class="gd">✓ alle Tests grün</text>
+        <text x="660" y="58" class="mu">beide aus derselben Sitzung</text>
+        <text x="0" y="118" class="hd">NEUE SITZUNG</text>
+        <rect x="0" y="130" width="160" height="40" rx="7" class="bxa"/>
+        <text x="80" y="155" text-anchor="middle" class="ac sm">spec.md</text>
+        <rect x="0" y="180" width="160" height="40" rx="7" class="bx"/>
+        <text x="80" y="205" text-anchor="middle" class="sm">Code</text>
+        <path d="M160 150 L236 166" class="ln" marker-end="url(#de-m-g)"/>
+        <path d="M160 200 L236 184" class="ln" marker-end="url(#de-m-g)"/>
+        <rect x="240" y="140" width="220" height="70" rx="8" class="bxa"/>
+        <text x="350" y="170" text-anchor="middle" class="ac">frischer Agent</text>
+        <text x="350" y="190" text-anchor="middle" class="mu">prüft Kriterium für Kriterium</text>
+        <path d="M460 175 H516" class="lna" marker-end="url(#de-m-ga)"/>
+        <rect x="520" y="150" width="240" height="50" rx="8" class="bx"/>
+        <text x="640" y="180" text-anchor="middle" class="bd sm">Kriterium 3 nicht erfüllt</text>
+      </svg>
+      <figcaption>Die Tests prüfen, was der Code tut. Ob der Code tut, was die Spec verlangt, prüft ein Agent mit frischem Kontext.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Befunde beheben -->
+<section class="slide" data-ch="Review">
+  <div class="inner">
+    <p class="eyebrow">Schritt 8 · Befunde beheben</p>
+    <h2>Beheben, abhaken, erneut prüfen.</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 180" role="img" aria-label="Das Review schreibt Befunde in progress.md; sie werden behoben und abgehakt, danach wird erneut geprüft, bis nichts mehr offen ist">
+            <defs><marker id="de-m-f" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker></defs>
+            <rect x="0" y="20" width="180" height="48" rx="8" class="bx"/>
+            <text x="90" y="49" text-anchor="middle" class="sm">Review</text>
+            <path d="M180 44 H246" class="ln" marker-end="url(#de-m-f)"/>
+            <rect x="250" y="20" width="180" height="48" rx="8" class="bxa"/>
+            <text x="340" y="41" text-anchor="middle" class="ac sm">progress.md</text>
+            <text x="340" y="58" text-anchor="middle" class="mu">Befunde als Checkliste</text>
+            <path d="M340 68 V116" class="ln" marker-end="url(#de-m-f)"/>
+            <rect x="250" y="120" width="180" height="48" rx="8" class="bx"/>
+            <text x="340" y="141" text-anchor="middle" class="sm">beheben</text>
+            <text x="340" y="158" text-anchor="middle" class="mu">Tests · abhaken</text>
+            <path d="M250 144 H90 V72" class="dash" marker-end="url(#de-m-f)"/>
+            <text x="100" y="118" class="mu">erneut prüfen,</text>
+            <text x="100" y="134" class="mu">bis nichts offen ist</text>
+          </svg>
+        </figure>
+        <p class="notebox">Einzelne kleine Befunde lassen sich auch direkt beheben. Bei mehreren sorgt die Liste dafür, dass nichts verloren geht, wenn die Sitzung endet.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 08</span>
+        <pre class="pcode">Arbeite die Befunde unter "Review" in
+specs/open/<b>{{feature}}</b>/progress.md ab.
+
+<u>- Einen Befund nach dem anderen.
+- Nach jedem: Tests laufen lassen, Befund
+  abhaken.
+- Lässt sich ein Befund nur beheben, indem die
+  Spec verletzt wird: nicht raten, mich fragen.</u>
+
+<b>Wenn alle abgehakt sind: sag Bescheid, dann
+läuft das Review erneut.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Abschluss -->
+<section class="slide" data-ch="Abschluss">
+  <div class="inner">
+    <p class="eyebrow">Schritt 9 · Abschluss</p>
+    <h2>Was sich wiederholen würde, wird zur Regel.</h2>
+    <div class="split">
+      <div>
+        <ul class="plain" style="margin-top:0">
+          <li data-n="01"><span><b>ARCHITECTURE.md</b> prüfen und nachziehen, wo das Feature etwas verändert hat</span></li>
+          <li data-n="02"><span>PR-Beschreibung aus spec.md und progress.md</span></li>
+          <li data-n="03"><span>Ordner von <b>specs/open/</b> nach <b>specs/done/</b></span></li>
+          <li data-n="04"><span>Erkenntnisse zurückführen: in die CLAUDE.md, einen Skill oder einen Hook</span></li>
+        </ul>
+        <p class="notebox">Ein Befund, der als Linter-Regel endet, taucht im nächsten Review nicht mehr auf.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 09 · Prompt 10 für 01–03 im Reiter „Prompts"</span>
+        <pre class="pcode">Lies die Review-Befunde in
+specs/open/<b>{{feature}}</b>/progress.md.
+
+Welche davon würden bei einem anderen Feature
+wieder auftreten?
+
+Schlag mir für jeden vor, wo er künftig
+abgefangen wird:
+<u>- als Regel in der CLAUDE.md
+- als Schritt in einem Skill
+- als Prüfung in Linter oder Hook</u>
+
+<b>Ändere noch nichts.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tag 2 -->
+<section class="slide" data-ch="Tag 2">
+  <div class="inner">
+    <p class="eyebrow">Tag 2</p>
+    <h2>Im bestehenden Code kommt das Verstehen zuerst.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 200" role="img" aria-label="Gegenüberstellung von Tag 1 und Tag 2: im neuen Projekt wird gebaut und dann geprüft, im bestehenden Code stehen Verstehen und Absichern vor der Änderung">
+        <text x="0" y="16" class="hd">TAG 1 · NEUES PROJEKT</text>
+        <rect x="0" y="30" width="900" height="50" rx="8" class="bx"/>
+        <text x="24" y="60" class="sm">Bauen</text>
+        <text x="200" y="60" class="sm">→ Review</text>
+        <text x="0" y="118" class="hd">TAG 2 · BESTEHENDES REPO</text>
+        <rect x="0" y="132" width="900" height="64" rx="8" class="bxa"/>
+        <text x="24" y="158" class="ac">Verstehen</text>
+        <text x="200" y="158" class="ac">→ Absichern</text>
+        <text x="380" y="158" class="ac">→ Ändern</text>
+        <text x="560" y="158" class="ac">→ Review</text>
+        <text x="24" y="180" class="sm">ARCHITECTURE.md · CLAUDE.md · betroffene Stellen · fehlende Tests</text>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<!-- Skills global -->
+<section class="slide" data-ch="Tag 2">
+  <div class="inner">
+    <p class="eyebrow">Tag 2 · Skills von gestern mitnehmen</p>
+    <h2>Ein Skill gilt dort, wo er liegt.</h2>
+    <div class="cols c3">
+      <div class="card">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></div>
+        <span class="k">Projekt</span>
+        <h4><code>.claude/skills/</code></h4>
+        <p>Liegt im Repo. Gilt für alle, die in diesem Repo arbeiten. Hier liegen die Skills von Tag 1.</p>
+      </div>
+      <div class="card hi">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /> <circle cx="12" cy="7" r="4" /></svg></div>
+        <span class="k">Persönlich</span>
+        <h4><code>~/.claude/skills/</code></h4>
+        <p>Liegt im eigenen Home-Verzeichnis. Gilt in allen eigenen Projekten, auch im Firmen-Repo von heute.</p>
+      </div>
+      <div class="card">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></svg></div>
+        <span class="k">Organisation</span>
+        <h4>Plugin</h4>
+        <p>Mehrere Skills gebündelt und an ein Team oder eine ganze Organisation verteilt.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="slide" data-ch="Tag 2">
+  <div class="inner">
+    <p class="eyebrow">Tag 2 · Verstehen</p>
+    <h2>ARCHITECTURE.md: das Gesamtbild des Systems.</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 300" role="img" aria-label="Aufbau einer ARCHITECTURE.md: Überblick, Module, Datenflüsse, Technologien, Patterns, Security und Altlasten">
+            <rect x="0" y="6" width="430" height="290" rx="9" class="bx"/>
+            <text x="20" y="34" class="ac">Überblick</text><text x="170" y="34" class="mu">Was macht das System?</text>
+            <line x1="20" y1="46" x2="410" y2="46" class="dash"/>
+            <text x="20" y="74" class="ac">Module</text><text x="170" y="74" class="mu">Wer ist wofür zuständig?</text>
+            <line x1="20" y1="86" x2="410" y2="86" class="dash"/>
+            <text x="20" y="114" class="ac">Datenflüsse</text><text x="170" y="114" class="mu">Wo rein, wo raus?</text>
+            <line x1="20" y1="126" x2="410" y2="126" class="dash"/>
+            <text x="20" y="154" class="ac">Technologien</text><text x="170" y="154" class="mu">Sprachen, Frameworks, DBs</text>
+            <line x1="20" y1="166" x2="410" y2="166" class="dash"/>
+            <text x="20" y="194" class="ac">Patterns</text><text x="170" y="194" class="mu">Welche Muster, wo?</text>
+            <line x1="20" y1="206" x2="410" y2="206" class="dash"/>
+            <text x="20" y="234" class="ac">Security</text><text x="170" y="234" class="mu">Auth, Secrets, Eingaben</text>
+            <line x1="20" y1="246" x2="410" y2="246" class="dash"/>
+            <text x="20" y="274" class="ac">Altlasten</text><text x="170" y="274" class="mu">Was ist historisch gewachsen?</text>
+          </svg>
+        </figure>
+        <p class="notebox">Der Agent liefert einen Entwurf. Bevor er ins Repo kommt, prüft ihn jemand, der das System kennt. Jede spätere Sitzung baut auf dieser Datei auf und übernimmt damit auch ihre Fehler.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 11 · für jedes Repo, auch das von gestern</span>
+        <pre class="pcode">Erkunde dieses Repository und schreibe
+ARCHITECTURE.md:
+
+<u>- Überblick: Was macht das System, für wen?
+- Module und ihre Verantwortlichkeit
+- Datenflüsse: wo kommen Daten rein, wo raus
+- Technologien: Sprachen, Frameworks,
+  Datenbanken, Infrastruktur
+- Patterns: welche Architektur- und
+  Entwurfsmuster wo verwendet werden
+- Security: Authentifizierung, Autorisierung,
+  Umgang mit Secrets und Eingaben
+- Altlasten: was wirkt historisch gewachsen</u>
+
+Erzeuge für die Module zusätzlich ein
+Mermaid-Diagramm.</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Absichern -->
+<section class="slide" data-ch="Tag 2">
+  <div class="inner">
+    <p class="eyebrow">Tag 2 · Absichern</p>
+    <h2>Vor der Umsetzung zwei Fragen.</h2>
+    <div class="split">
+      <div>
+        <div class="cols" style="margin-top:0">
+          <div class="card">
+            <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="16" y="16" width="6" height="6" rx="1" /> <rect x="2" y="16" width="6" height="6" rx="1" /> <rect x="9" y="2" width="6" height="6" rx="1" /> <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" /> <path d="M12 12V8" /></svg></div>
+            <span class="k">Frage 1</span>
+            <h4>Was ist betroffen?</h4>
+            <p>Alle Stellen, die den zu ändernden Code aufrufen oder von ihm abhängen.</p>
+          </div>
+          <div class="card hi">
+            <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> <path d="m9 12 2 2 4-4" /></svg></div>
+            <span class="k">Frage 2</span>
+            <h4>Ist es abgesichert?</h4>
+            <p>Abgesichert wird nur, was die Änderung berührt. Oft reicht ein Test auf Ebene der Schnittstelle, der den betroffenen Ablauf einmal durchspielt.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="pk">Prompt 14</span>
+        <pre class="pcode">Lies spec.md in specs/open/<b>{{feature}}</b>/,
+die CLAUDE.md und die ARCHITECTURE.md.
+
+Bevor wir umsetzen, klär zwei Fragen:
+<u>1. Was ist betroffen? Alle Stellen, die den
+   zu ändernden Code aufrufen oder von ihm
+   abhängen.
+2. Ist es abgesichert? Welche dieser Stellen
+   sind durch Tests abgedeckt?</u>
+
+Wo Tests fehlen: Schlag mir die kleinste
+Absicherung vor, die den betroffenen Ablauf
+abdeckt, etwa einen Test auf Ebene der
+Schnittstelle statt vieler Unit-Tests.
+
+<b>Ergebnis in progress.md unter "Vorab".
+Noch kein Code.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Hooks -->
+<section class="slide" data-ch="Hooks">
+  <div class="inner">
+    <p class="eyebrow">Ausblick · Hooks</p>
+    <h2>Hooks halten den Agenten technisch in der Spur.</h2>
+    <p class="lede">Anweisungen in CLAUDE.md und Spec befolgt der Agent mit hoher Wahrscheinlichkeit. Ein Hook ist ein Programm, das bei jedem Mal läuft.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 112" role="img" aria-label="Hooks greifen an drei Stellen: während der Agent arbeitet, beim Commit und in der CI">
+        <defs><marker id="de-m-h" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker></defs>
+        <text x="0" y="16" class="hd">WO HOOKS GREIFEN</text>
+        <rect x="0" y="30" width="280" height="74" rx="8" class="bxa"/>
+        <g class="dic" transform="translate(244 40) scale(1)"><path d="M12 8V4H8" /> <rect width="16" height="12" x="4" y="8" rx="2" /> <path d="M2 14h2" /> <path d="M20 14h2" /> <path d="M15 13v2" /> <path d="M9 13v2" /></g>
+        <text x="20" y="56" class="ac">während der Agent arbeitet</text>
+        <text x="20" y="76" class="mu">z. B. Formatter nach jeder Änderung</text>
+        <text x="20" y="92" class="mu">oder Tests, wenn der Agent fertig ist</text>
+        <path d="M280 67 H306" class="ln" marker-end="url(#de-m-h)"/>
+        <rect x="310" y="30" width="280" height="74" rx="8" class="bx"/>
+        <g class="dic" transform="translate(554 40) scale(1)"><circle cx="12" cy="12" r="3" /> <line x1="3" x2="9" y1="12" y2="12" /> <line x1="15" x2="21" y1="12" y2="12" /></g>
+        <text x="330" y="56">beim Commit</text>
+        <text x="330" y="76" class="mu">z. B. gitleaks, Linter</text>
+        <path d="M590 67 H616" class="ln" marker-end="url(#de-m-h)"/>
+        <rect x="620" y="30" width="280" height="74" rx="8" class="bx"/>
+        <g class="dic" transform="translate(864 40) scale(1)"><rect width="20" height="8" x="2" y="2" rx="2" ry="2" /> <rect width="20" height="8" x="2" y="14" rx="2" ry="2" /> <line x1="6" x2="6.01" y1="6" y2="6" /> <line x1="6" x2="6.01" y1="18" y2="18" /></g>
+        <text x="640" y="56">in der CI</text>
+        <text x="640" y="76" class="mu">dieselben Prüfungen, verbindlich</text>
+      </svg>
+      <figcaption>Prompt 15 in der Bibliothek hilft beim Einrichten.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Hooks Beispiel -->
+<section class="slide" data-ch="Hooks">
+  <div class="inner">
+    <p class="eyebrow">Ausblick · zwei Beispiele</p>
+    <h2>Beides steht in .claude/settings.json.</h2>
+    <pre class="pcode tree" style="margin-top:22px">{
+  <span class="t">"permissions": {
+    "deny": ["Read(./.env)", "Edit(./.env)"]
+  },</span>
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{
+        "type": "command",
+        "command": <b>"jq -r '.tool_input.file_path' | xargs npx prettier --write"</b>
+      }]
+    }]
+  }
+}</pre>
+    <div class="cols c2">
+      <div class="card tl">
+        <span class="k">Beispiel 1 · .env sperren</span>
+        <p>Dafür braucht es keinen Hook. Eine <code>deny</code>-Regel verbietet den Dateiwerkzeugen von Claude Code, die Datei zu lesen oder zu bearbeiten.</p>
+      </div>
+      <div class="card hi">
+        <span class="k a">Beispiel 2 · Formatter nach jeder Änderung</span>
+        <p>Nach jedem Bearbeiten oder Schreiben einer Datei übergibt Claude Code dem Befehl, welche Datei es war. <code>jq</code> liest den Pfad aus, <code>prettier</code> formatiert genau diese Datei.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Ablauf 1 -->
+<section class="slide" data-ch="Ablauf">
+  <div class="inner">
+    <p class="eyebrow">Ablauf · Tag 1</p>
+    <h2>Das eigene Projekt</h2>
+    <ol class="steps">
+      <li>Vorstellung</li>
+      <li>Begriffe und wie Agenten arbeiten</li>
+      <li>Werkzeugkunde Claude Code</li>
+      <li>Projektvorstellungen</li>
+      <li class="mark">Freistil-Sprint: 20 Minuten ohne alles</li>
+      <li>features.md</li>
+      <li>CLAUDE.md</li>
+      <li>brainstorming.md in mehreren Runden</li>
+      <li>spec.md</li>
+      <li class="mark">Skill ableiten lassen</li>
+      <li>Umsetzung mit progress.md</li>
+      <li>Review in neuer Sitzung</li>
+      <li>Befunde beheben, Abschluss</li>
+      <li>App-Vorstellungen</li>
+    </ol>
+  </div>
+</section>
+
+<!-- Ablauf 2 -->
+<section class="slide" data-ch="Ablauf">
+  <div class="inner">
+    <p class="eyebrow">Ablauf · Tag 2</p>
+    <h2>Die echte Aufgabe</h2>
+    <ol class="steps">
+      <li class="mark">Skills von gestern global machen</li>
+      <li>Die reale Aufgabe: Repo und Ticket</li>
+      <li class="mark">ARCHITECTURE.md erstellen und prüfen</li>
+      <li>CLAUDE.md für das bestehende Repo</li>
+      <li>brainstorming.md → spec.md mit dem Skill</li>
+      <li>Betroffene Stellen und Absicherung klären</li>
+      <li>Umsetzung mit progress.md</li>
+      <li>Review in neuer Sitzung</li>
+      <li>Befunde beheben, Abschluss, Erkenntnisse zurückführen</li>
+      <li>Ausblick: Hooks mit zwei Beispielen</li>
+      <li>Welche Skills gehören ins Team-Repo?</li>
+      <li>Feedback-Runde</li>
+    </ol>
+  </div>
+</section>
+
+<!-- Feedback -->
+<section class="slide" data-ch="Feedback">
+  <div class="inner">
+    <p class="eyebrow">Zum Schluss</p>
+    <h2>Feedback-Runde</h2>
+    <ul class="plain" style="margin-top:30px">
+      <li data-n="→"><span>Was nimmst du mit?</span></li>
+      <li data-n="→"><span>Was hat dir gefehlt?</span></li>
+      <li data-n="→"><span>Was würdest du weglassen?</span></li>
+    </ul>
+  </div>
+</section>
+
+</div><!-- /deck -->
+
+<!-- ============ PROMPTS ============ -->
+<div class="view prompts" id="prompts-de" hidden>
+  <div class="pl-head">
+    <p class="eyebrow">Zum Mitnehmen</p>
+    <h2>Prompt-Bibliothek</h2>
+    <p class="lede">Für jeden Schritt der Kette ein Prompt. Abspeichern, anpassen, in eigene Skills überführen. <span class="ph-note">{{Platzhalter}}</span> ersetzen.</p>
+    <div class="rules">
+      <div class="rule"><span>01</span><div>Wo etwas unklar ist, <b>fragt der Agent nach</b>.</div></div>
+      <div class="rule"><span>02</span><div>Jeder Prompt sagt, <b>wo Schluss ist</b>: noch keinen Code, noch nichts ändern.</div></div>
+      <div class="rule"><span>03</span><div>Ergebnisse landen <b>in Dateien</b>, damit die nächste Sitzung darauf aufbauen kann.</div></div>
+    </div>
+  </div>
+
+  <p class="plabel">Tag 1 · Die Kette</p>
+  <div class="pl-grid">
+
+  <details class="prompt" open>
+    <summary><span class="pnum">01</span><span class="ptitle">features.md aus der Projektidee</span><span class="pwhen">Projektstart</span></summary>
+    <div class="pbody">
+      <div class="pnote">Der Agent leitet auch die Features ab, die in der Idee stecken, ohne genannt zu sein. Die Datei ist die gemeinsame Referenz, bis zu jedem Feature eine Spec existiert.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Hier ist meine Projektidee:
+<mark>{{Beschreibung, so ausführlich wie möglich}}</mark>
+
+Leite daraus die Features ab, die diese Idee voraussetzt, auch die,
+die ich nicht ausdrücklich genannt habe. Schreib sie in eine features.md:
+- pro Feature ein Satz, was es kann
+- Reihenfolge: was zuerst da sein muss
+- was für eine erste lauffähige Version wegfallen kann
+
+Stell mir zuerst die Fragen, die du dafür brauchst.
+Noch keine Spec, noch kein Code.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">02</span><span class="ptitle">CLAUDE.md für ein neues Projekt</span><span class="pwhen">einmal pro Repo</span></summary>
+    <div class="pbody">
+      <div class="pnote">Andere Agenten-Werkzeuge lesen dieselben Inhalte aus einer <code>AGENTS.md</code>.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Lass uns eine CLAUDE.md erstellen, die festhält, was du beim Arbeiten
+in diesem Projekt jedes Mal wissen musst. Grundlage ist die features.md.
+
+Schlag mir vor:
+- Sprache, Framework, Testframework, wie man startet und testet
+- Ordnerstruktur, inklusive specs/open/ für laufende und specs/done/
+  für abgeschlossene Features (specs/done/ nur auf Nachfrage lesen)
+- Namenskonventionen und Fehlerbehandlung
+- Was nie getan werden soll
+
+Frag mich, bevor du etwas festschreibst. Kurze Anweisungen, keine Prosa.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">03</span><span class="ptitle">brainstorming.md in mehreren Runden</span><span class="pwhen">pro Feature</span></summary>
+    <div class="pbody">
+      <div class="pnote">Die Ausgangslage kann ein Eintrag aus der features.md oder ein Ticket-Text sein. <b>Die Runden laufen, bis keine Frage mehr offen ist.</b></div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Wir bereiten dieses Feature vor:
+<mark>{{Feature-Beschreibung oder Ticket-Text}}</mark>
+
+Schreib specs/open/<mark>{{feature}}</mark>/brainstorming.md mit
+- Ausgangslage (die Beschreibung von oben)
+- Lösungsoptionen mit Vor- und Nachteilen
+- deiner Empfehlung mit Begründung
+- Risiken
+- offenen Fragen an mich
+
+Wir gehen das in mehreren Runden durch: Ich markiere meine Auswahl und
+beantworte die Fragen in der Datei, du passt daraufhin Optionen und
+Empfehlung an. Bis keine Frage mehr offen ist.
+
+Noch keine Spec, noch kein Code.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">04</span><span class="ptitle">spec.md</span><span class="pwhen">wenn keine Frage mehr offen ist</span></summary>
+    <div class="pbody">
+      <div class="pnote">Der erste Absatz sichert die Reihenfolge ab: <b>Solange im Brainstorming etwas offen ist, entsteht keine Spec.</b></div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Prüfe zuerst, ob in specs/open/<mark>{{feature}}</mark>/brainstorming.md noch Fragen
+offen sind. Wenn ja: nenne sie und hör auf.
+
+Sonst erzeuge spec.md im selben Ordner mit diesen Abschnitten:
+- Intent: Warum gibt es das?
+- Scope: Was ist enthalten?
+- Non-Goals: Was ausdrücklich nicht?
+- Akzeptanzkriterien: nummeriert, jedes einzeln überprüfbar,
+  formuliert als beobachtbares Verhalten
+- Constraints: technische und fachliche Grenzen
+
+Beschreibe das Was und Warum, nie das Wie.
+Wenn ein Akzeptanzkriterium nicht objektiv überprüfbar ist, schreib es um.
+
+Noch kein Code.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">05</span><span class="ptitle">Skill aus dem eigenen Vorgehen ableiten</span><span class="pwhen">nach der ersten Spec</span></summary>
+    <div class="pbody">
+      <div class="pnote">Nach mehreren Stunden Arbeit ist der Anfang der Unterhaltung nicht mehr vollständig im Kontext. <b>Die Dateien sind es.</b></div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Wir sind für Feature <mark>{{feature}}</mark> diesen Weg gegangen:
+brainstorming.md in mehreren Runden, danach spec.md.
+
+Lies beide Dateien und rekonstruiere daraus das Vorgehen: welche Schritte,
+welche Rückfragen an mich, welche Struktur im Ergebnis.
+
+Leg daraus einen Skill unter .claude/skills/<mark>{{name}}</mark>/SKILL.md an.
+Eingabe des Skills ist eine Feature-Beschreibung, egal ob aus der
+features.md oder aus einem Ticket.
+
+Stütz dich auf die Dateien, nicht auf dein Gedächtnis an unsere Unterhaltung.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">06</span><span class="ptitle">Umsetzung mit progress.md</span><span class="pwhen">wenn die Spec steht</span></summary>
+    <div class="pbody">
+      <div class="pnote">Der Plan steht am Anfang der progress.md und wird dort abgehakt. <b>Wer ihn vor dem ersten Code lesen will, startet im Plan Mode.</b></div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Setze specs/open/<mark>{{feature}}</mark>/spec.md um.
+
+Schreib zuerst einen Plan als Checkliste in progress.md:
+- Schritte in Reihenfolge
+- zu jedem Schritt das Akzeptanzkriterium, das er erfüllt,
+  und wie er getestet wird
+- Abschnitte "Entscheidungen", "Offene Punkte" und "Review"
+
+Dann arbeite die Checkliste ab. Nach jedem Schritt: Tests laufen lassen,
+abhaken, Entscheidungen notieren.
+
+Fehlt dir etwas: nicht raten. Unter "Offene Punkte" notieren
+und mich fragen.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">07</span><span class="ptitle">Review gegen die Spec</span><span class="pwhen">in einer neuen Sitzung</span></summary>
+    <div class="pbody">
+      <div class="pnote">In einer neuen Sitzung prüft der Agent gegen die Spec, ohne das Wissen aus der Umsetzung. Im Alltag gehören vor Schritt 1 auch Linter, Checkstyle und Security-Scans wie trivy.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Prüfe specs/open/<mark>{{feature}}</mark>/ gegen die spec.md.
+Du hast den Code nicht geschrieben.
+
+1. Lass die Tests laufen. Schlagen sie fehl, brich ab und melde nur das.
+2. Geh jedes Akzeptanzkriterium durch: Ist es erfüllt, und woran erkennst
+   du das? Was du nicht nachweisen kannst, ist ein Befund.
+   Wurde etwas gebaut, das nicht in der Spec steht, oder ein Non-Goal
+   verletzt?
+3. Prüfe gegen SOLID und DRY. Melde nur konkrete Verstöße mit Begründung.
+
+Schreib die Befunde als Checkliste unter "Review" in progress.md.
+Ändere noch nichts.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">08</span><span class="ptitle">Befunde beheben</span><span class="pwhen">nach dem Review</span></summary>
+    <div class="pbody">
+      <div class="pnote">Wenn alle Befunde abgehakt sind, läuft das Review erneut, bis nichts mehr offen ist.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Arbeite die Befunde unter "Review" in
+specs/open/<mark>{{feature}}</mark>/progress.md ab.
+
+- Einen Befund nach dem anderen.
+- Nach jedem: Tests laufen lassen, Befund abhaken.
+- Lässt sich ein Befund nur beheben, indem die Spec verletzt wird:
+  nicht raten, mich fragen.
+
+Wenn alle abgehakt sind: sag Bescheid, dann läuft das Review erneut.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">09</span><span class="ptitle">Erkenntnisse zurückführen</span><span class="pwhen">nach dem Review</span></summary>
+    <div class="pbody">
+      <div class="pnote">Ein Befund, der als Linter-Regel oder Hook endet, <b>taucht im nächsten Review nicht mehr auf</b>.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Lies die Review-Befunde in specs/open/<mark>{{feature}}</mark>/progress.md.
+
+Welche davon würden bei einem anderen Feature wieder auftreten?
+
+Schlag mir für jeden vor, wo er künftig abgefangen wird:
+- als Regel in der CLAUDE.md
+- als Schritt in einem Skill
+- als Prüfung in Linter oder Hook
+
+Ändere noch nichts.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">10</span><span class="ptitle">Abschluss: Doku, PR, Archiv</span><span class="pwhen">Feature fertig</span></summary>
+    <div class="pbody">
+      <div class="pnote">Hier wird die <code>ARCHITECTURE.md</code> gepflegt, jedes Mal, wenn ein Feature fertig ist.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Das Feature <mark>{{feature}}</mark> ist umgesetzt und reviewt.
+
+1. Prüfe, ob die ARCHITECTURE.md noch stimmt, und aktualisiere sie
+   dort, wo das Feature etwas verändert hat.
+2. Schreib eine PR-Beschreibung aus spec.md und progress.md.
+3. Verschiebe specs/open/<mark>{{feature}}</mark>/ nach specs/done/.</pre></div>
+    </div>
+  </details>
+
+  </div>
+
+  <p class="plabel">Tag 2 · Bestehender Code</p>
+  <div class="pl-grid">
+
+  <details class="prompt">
+    <summary><span class="pnum">11</span><span class="ptitle">ARCHITECTURE.md erstellen</span><span class="pwhen">für jedes Repo</span></summary>
+    <div class="pbody">
+      <div class="pnote">Der Agent liefert einen Entwurf. <b>Bevor er ins Repo kommt, prüft ihn jemand, der das System kennt.</b> Jede spätere Sitzung baut darauf auf.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Erkunde dieses Repository und schreibe ARCHITECTURE.md:
+
+- Überblick: Was macht das System, für wen?
+- Module und ihre Verantwortlichkeit
+- Datenflüsse: wo kommen Daten rein, wo raus, was liegt dazwischen
+- Technologien: Sprachen, Frameworks, Datenbanken, Infrastruktur
+- Patterns: welche Architektur- und Entwurfsmuster wo verwendet werden
+- Security: Authentifizierung, Autorisierung, Umgang mit Secrets
+  und Eingaben
+- Altlasten: was wirkt historisch gewachsen
+
+Erzeuge für die Module zusätzlich ein Mermaid-Diagramm.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">12</span><span class="ptitle">CLAUDE.md für ein bestehendes Repo</span><span class="pwhen">nach der ARCHITECTURE.md</span></summary>
+    <div class="pbody">
+      <div class="pnote">Beschrieben werden <b>die Konventionen, die tatsächlich gelten</b>. Verbesserungswünsche gehören in ein Ticket.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Lies die ARCHITECTURE.md und die letzten 50 Commits.
+
+Erstelle eine CLAUDE.md, die die Konventionen beschreibt, die hier
+tatsächlich gelten:
+
+- Wie wird hier benannt, strukturiert, getestet?
+- Welche Muster wiederholen sich, auch wenn sie nicht schön sind?
+- Wo widerspricht sich das Repo selbst?
+  (Als Frage an mich formulieren, nicht selbst auflösen.)
+- Was darf auf keinen Fall angefasst werden?
+
+Beschreibe den Ist-Zustand. Verbesserungsvorschläge gehören nicht hierher.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">13</span><span class="ptitle">Einen Ablauf durchs System verfolgen</span><span class="pwhen">vor der eigenen Änderung</span></summary>
+    <div class="pbody">
+      <div class="pnote">Die dritte Markierung liefert direkt die betroffenen Stellen für Prompt 14.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Ich will verstehen, wie <mark>{{Vorgang}}</mark> durch dieses System läuft.
+
+Verfolge den Weg vom Einstiegspunkt bis zum Ende und zeig mir die Kette:
+Datei und Funktion → was dort passiert → wohin es weitergeht.
+
+Markiere dabei:
+- Stellen, an denen sich der Weg verzweigt
+- Stellen, an denen Zustand verändert wird
+- Stellen, die ich anfassen müsste, um <mark>{{geplante Änderung}}</mark> umzusetzen
+
+Erzeuge zusätzlich ein Mermaid-Sequenzdiagramm davon.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">14</span><span class="ptitle">Betroffene Stellen und Absicherung</span><span class="pwhen">vor der Umsetzung</span></summary>
+    <div class="pbody">
+      <div class="pnote">Abgesichert wird nur, was die Änderung berührt. <b>Oft reicht ein Test auf Ebene der Schnittstelle</b>, der den betroffenen Ablauf einmal durchspielt.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Lies spec.md in specs/open/<mark>{{feature}}</mark>/, die CLAUDE.md
+und die ARCHITECTURE.md.
+
+Bevor wir umsetzen, klär zwei Fragen:
+1. Was ist betroffen? Alle Stellen, die den zu ändernden Code aufrufen
+   oder von ihm abhängen.
+2. Ist es abgesichert? Welche dieser Stellen sind durch Tests abgedeckt?
+
+Wo Tests fehlen: Schlag mir die kleinste Absicherung vor, die den
+betroffenen Ablauf abdeckt, etwa einen Test auf Ebene der Schnittstelle
+statt vieler Unit-Tests.
+
+Schreib das Ergebnis in progress.md unter "Vorab". Noch kein Code.</pre></div>
+    </div>
+  </details>
+
+  </div>
+
+  <p class="plabel">Ausblick · Hooks</p>
+  <div class="pl-grid">
+
+  <details class="prompt">
+    <summary><span class="pnum">15</span><span class="ptitle">Agent-Hooks einrichten</span><span class="pwhen">nach dem Workshop</span></summary>
+    <div class="pbody">
+      <div class="pnote">Hooks laufen mit deinen Benutzerrechten. Nur Befehle eintragen, die du verstehst. Am Ende jede Regel einmal absichtlich auslösen, um zu sehen, dass sie greift. pre-commit mit gitleaks oder trivy gehört zusätzlich ins Repo und in die CI.</div>
+      <div class="pwrap"><button class="copy">Kopieren</button><pre>Richte für dieses Projekt in .claude/settings.json ein:
+
+1. Eine deny-Regel in den permissions, damit <mark>{{pfade, z. B. .env, secrets/}}</mark>
+   weder gelesen noch bearbeitet werden.
+2. Einen PostToolUse-Hook für Edit und Write, der <mark>{{formatter}}</mark>
+   auf die geänderte Datei anwendet.
+3. Einen Stop-Hook, der <mark>{{Testbefehl}}</mark> ausführt, wenn du fertig bist.
+   Schlagen Tests fehl, sollst du weiterarbeiten.
+
+Erklär mir jede Regel in einem Satz und zeig mir, wie ich sie
+absichtlich auslösen kann, damit ich sehe, dass sie greift.</pre></div>
+    </div>
+  </details>
+
+  </div>
+</div>
+
+
+<div class="view deck" id="deck-en" tabindex="-1" hidden>
+
+<!-- Title -->
+<section class="slide title-slide" data-ch="Title">
+  <div class="inner">
+    <p class="eyebrow">Foundation workshop · 2 days</p>
+    <h1>Agentic&nbsp;Engineering<br>&amp; <span>Spec-driven Development</span></h1>
+    <p class="lede">Two days of Claude Code. Day 1 on your own project, day 2 on a real task from your daily work.</p>
+    <div class="meta-row">
+      <span class="chip">Claude Code</span>
+      <span class="chip">Hands-on</span>
+      <span class="chip">Own laptop, own licence</span>
+    </div>
+  </div>
+</section>
+
+<!-- About me -->
+<section class="slide" data-ch="Introduction">
+  <div class="inner">
+    <p class="eyebrow">Who's up front</p>
+    <div class="about">
+      <div>
+        <h2>Daniel<br>Vanella</h2>
+        <p class="lede">Making agentic engineering tangible for developers and taking it mainstream.</p>
+      </div>
+      <div class="facts">
+        <div class="fact"><span>Company</span><span>Vanella GmbH &amp; Co. KG</span></div>
+        <div class="fact"><span>Role</span><span>Managing Director</span></div>
+        <div class="fact"><span>Background</span><span>Certified Software Architect · Solution Architect · Agentic Engineer</span></div>
+        <div class="fact"><span>Focus</span><span>Java, Kotlin, Spring Boot · logistics and intralogistics</span></div>
+        <div class="fact"><span>With agents</span><span>from the start</span></div>
+        <div class="fact"><span>Projects</span><span>SAP integrations · material flow controllers · knowledge graphs for system landscapes</span></div>
+        <div class="fact"><span>Contact</span><span>dv@vanella.gmbh</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Round of introductions -->
+<section class="slide" data-ch="Introduction">
+  <div class="inner">
+    <p class="eyebrow">Round of introductions</p>
+    <h2>One minute per person</h2>
+    <ul class="plain" style="margin-top:30px">
+      <li data-n="→"><span>What are you working on right now?</span></li>
+      <li data-n="→"><span>How much experience do you have with coding agents?</span></li>
+      <li data-n="→"><span>What do you want to be able to do after these two days?</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- Frame -->
+<section class="slide" data-ch="Overview">
+  <div class="inner">
+    <p class="eyebrow">The setup</p>
+    <h2>Two days, two projects</h2>
+    <div class="cols c2">
+      <div class="card">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /> <path d="M9 18h6" /> <path d="M10 22h4" /></svg></div>
+        <span class="k">Day 1 · Your own project idea</span>
+        <h4>The foundations</h4>
+        <ul>
+          <li>Terms: code completion, vibe coding, agentic engineering</li>
+          <li>How an agent works</li>
+          <li>Using Claude Code</li>
+          <li>The workflow from idea to review</li>
+          <li>Deriving skills from your own process</li>
+        </ul>
+      </div>
+      <div class="card hi">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 21V10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v11" /> <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 1.132-1.803l7.95-3.974a2 2 0 0 1 1.837 0l7.948 3.974A2 2 0 0 1 22 8z" /> <path d="M6 13h12" /> <path d="M6 17h12" /></svg></div>
+        <span class="k">Day 2 · A real task from your daily work</span>
+        <h4>Advanced topics</h4>
+        <ul>
+          <li>Architecture analysis with ARCHITECTURE.md</li>
+          <li>CLAUDE.md for existing code</li>
+          <li>Making changes safely in existing code</li>
+          <li>Documentation when a feature is done</li>
+          <li>Using skills globally and in the team</li>
+          <li>Hooks</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Three ways of working -->
+<section class="slide" data-ch="Terms">
+  <div class="inner">
+    <p class="eyebrow">Terms</p>
+    <h2>Three ways of working with AI in code</h2>
+    <div class="cols c3">
+      <div class="card">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 8h.01" /> <path d="M12 12h.01" /> <path d="M14 8h.01" /> <path d="M16 12h.01" /> <path d="M18 8h.01" /> <path d="M6 8h.01" /> <path d="M7 16h10" /> <path d="M8 12h.01" /> <rect width="20" height="16" x="2" y="4" rx="2" /></svg></div>
+        <h4>AI code completion</h4>
+        <div class="kv"><span>thinks</span><b>Human</b></div>
+        <div class="kv"><span>decides</span><b>Human</b></div>
+        <div class="kv"><span>good for</span><b>Lines, boilerplate</b></div>
+        <p class="after">The editor suggests the next line. You accept it or you don't.</p>
+      </div>
+      <div class="card">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /> <path d="M20 2v4" /> <path d="M22 4h-4" /> <circle cx="4" cy="20" r="2" /></svg></div>
+        <h4>Vibe coding</h4>
+        <div class="kv"><span>thinks</span><b>AI</b></div>
+        <div class="kv"><span>decides</span><b class="bad">AI</b></div>
+        <div class="kv"><span>good for</span><b>Prototypes, throwaway code</b></div>
+        <p class="after">You describe what you want and look at the result. You barely read the code.</p>
+      </div>
+      <div class="card hi">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="3" /> <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" /> <circle cx="18" cy="5" r="3" /></svg></div>
+        <h4>Agentic engineering</h4>
+        <div class="kv"><span>thinks</span><b>AI</b></div>
+        <div class="kv"><span>decides</span><b class="acc">Human</b></div>
+        <div class="kv"><span>good for</span><b class="acc">Production code</b></div>
+        <p class="after">The agent works on its own, within rules, a spec and checks that you define.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Statement -->
+<section class="slide" data-ch="Terms">
+  <div class="inner">
+    <p class="statement">Agentic engineering means narrowing the agent's room to act and <span>guiding it</span> step by step.</p>
+    <p class="attrib">For that, you first need a picture of how an agent works.</p>
+  </div>
+</section>
+
+<!-- ReAct -->
+<section class="slide" data-ch="How agents work">
+  <div class="inner">
+    <p class="eyebrow">How agents work</p>
+    <h2>The ReAct loop</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 214" role="img" aria-label="The agent thinks about the next step, carries it out, observes the result and starts again until the goal is reached">
+        <defs><marker id="en-m-a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker>
+        <marker id="en-m-aa" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker></defs>
+        <rect x="40" y="16" width="180" height="104" rx="8" class="bx"/>
+        <g class="dic" transform="translate(115 28) scale(1.25)"><path d="M12 18V5" /> <path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4" /> <path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5" /> <path d="M17.997 5.125a4 4 0 0 1 2.526 5.77" /> <path d="M18 18a4 4 0 0 0 2-7.464" /> <path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517" /> <path d="M6 18a4 4 0 0 1-2-7.464" /> <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77" /></g>
+        <text x="130" y="86" text-anchor="middle">Reason</text>
+        <text x="130" y="106" text-anchor="middle" class="mu">What is the next step?</text>
+        <line x1="220" y1="68" x2="298" y2="68" class="ln flow" marker-end="url(#en-m-a)"/>
+        <rect x="300" y="16" width="180" height="104" rx="8" class="bx"/>
+        <g class="dic" transform="translate(375 28) scale(1.25)"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" /></g>
+        <text x="390" y="86" text-anchor="middle">Act</text>
+        <text x="390" y="106" text-anchor="middle" class="mu">carries out the step</text>
+        <line x1="480" y1="68" x2="558" y2="68" class="ln flow" marker-end="url(#en-m-a)"/>
+        <rect x="560" y="16" width="180" height="104" rx="8" class="bx"/>
+        <g class="dic" transform="translate(635 28) scale(1.25)"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /> <circle cx="12" cy="12" r="3" /></g>
+        <text x="650" y="86" text-anchor="middle">Observe</text>
+        <text x="650" y="106" text-anchor="middle" class="mu">What came out of it?</text>
+        <path d="M650 120 L650 170 L130 170 L130 122" class="ln flow" marker-end="url(#en-m-a)"/>
+        <text x="390" y="198" text-anchor="middle" class="mu">… until the goal is reached</text>
+        <line x1="740" y1="68" x2="806" y2="68" class="lna" marker-end="url(#en-m-aa)"/>
+        <text x="855" y="73" text-anchor="middle" class="ac">Result</text>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<!-- Context window -->
+<section class="slide" data-ch="How agents work">
+  <div class="inner">
+    <p class="eyebrow">How agents work</p>
+    <h2>The context window fills up over a session.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 222" role="img" aria-label="Before compaction the context window holds the system prompt, CLAUDE.md and a long history. Compaction only summarises the history; system prompt and CLAUDE.md stay fully loaded">
+        <text x="0" y="16" class="hd">BEFORE COMPACTION</text>
+        <rect x="0" y="28" width="900" height="52" rx="7" class="bx"/>
+        <rect x="1.5" y="29.5" width="148.5" height="49" rx="6" fill="var(--flow-soft)"/>
+        <rect x="152" y="29.5" width="128" height="49" fill="var(--signal-soft)"/>
+        <rect x="282" y="29.5" width="498" height="49" fill="var(--surface-2)"/>
+        <text x="75" y="50" text-anchor="middle" class="sm tl">System prompt</text>
+        <text x="75" y="66" text-anchor="middle" class="mu">behaviour · tools</text>
+        <text x="216" y="58" text-anchor="middle" class="sm ac">CLAUDE.md</text>
+        <text x="531" y="50" text-anchor="middle" class="sm">History</text>
+        <text x="531" y="66" text-anchor="middle" class="mu">messages · tool calls · file contents · outputs</text>
+        <text x="841" y="58" text-anchor="middle" class="mu">free</text>
+        <path d="M2 88 V96 H278 V88" class="ln"/>
+        <text x="140" y="112" text-anchor="middle" class="mu">stays loaded</text>
+        <path d="M284 88 V96 H778 V88" class="lna"/>
+        <text x="531" y="112" text-anchor="middle" class="sm ac">gets summarised when the window is full</text>
+        <path d="M531 118 L341 158" class="dash"/>
+        <text x="0" y="150" class="hd">AFTERWARDS</text>
+        <rect x="0" y="162" width="900" height="52" rx="7" class="bx"/>
+        <rect x="1.5" y="163.5" width="148.5" height="49" rx="6" fill="var(--flow-soft)"/>
+        <rect x="152" y="163.5" width="128" height="49" fill="var(--signal-soft)"/>
+        <rect x="282" y="163.5" width="118" height="49" fill="var(--surface-2)"/>
+        <text x="75" y="192" text-anchor="middle" class="sm tl">System prompt</text>
+        <text x="216" y="192" text-anchor="middle" class="sm ac">CLAUDE.md</text>
+        <text x="341" y="192" text-anchor="middle" class="sm">Summary</text>
+        <text x="651" y="192" text-anchor="middle" class="mu">free</text>
+      </svg>
+      <figcaption>Only a summary of the history remains. Details from the beginning, such as an exact error message or an early decision, are gone afterwards. /context shows the current usage.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Guessing -->
+<section class="slide" data-ch="How agents work">
+  <div class="inner">
+    <p class="eyebrow">The root cause</p>
+    <h2>When information is missing, the agent fills the gap itself.</h2>
+    <div class="cols c3">
+      <div class="card"><div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /> <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /> <path d="M12 17h.01" /></svg></div><span class="k">Expectation</span><p>"It will ask if something is unclear."</p></div>
+      <div class="card"><div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="12" height="12" x="2" y="10" rx="2" ry="2" /> <path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6" /> <path d="M6 18h.01" /> <path d="M10 14h.01" /> <path d="M15 6h.01" /> <path d="M18 9h.01" /></svg></div><span class="k">Behaviour</span><p>The gap is filled with the most likely assumption. Silently, without a hint.</p></div>
+      <div class="card hi"><div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /> <path d="M12 9v4" /> <path d="M12 17h.01" /></svg></div><span class="k">Consequence</span><p>Most failures are guessed assumptions.</p></div>
+    </div>
+    <p class="notebox">That is why almost every prompt in this collection contains the same line: <span class="tiny">Don't guess. Ask me.</span></p>
+  </div>
+</section>
+
+<!-- Stochastics -->
+<section class="slide" data-ch="How agents work">
+  <div class="inner">
+    <p class="eyebrow">Stochastics</p>
+    <h2>Same prompt, same repo, three results.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 230" role="img" aria-label="An identical prompt produces three different results in three runs">
+        <defs><marker id="en-m-s" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker></defs>
+        <rect x="0" y="82" width="230" height="62" rx="8" class="bxa"/>
+        <text x="115" y="110" text-anchor="middle" class="ac">one prompt</text>
+        <text x="115" y="130" text-anchor="middle" class="mu">unchanged, 3×</text>
+        <path d="M230 113 L300 113 L300 42 L358 42" class="ln flow" marker-end="url(#en-m-s)"/>
+        <path d="M230 113 L358 113" class="ln flow" marker-end="url(#en-m-s)"/>
+        <path d="M230 113 L300 113 L300 184 L358 184" class="ln flow" marker-end="url(#en-m-s)"/>
+        <rect x="360" y="18" width="540" height="48" rx="7" class="bx"/>
+        <text x="380" y="47" class="sm">Structure A · 4 files · custom error class</text>
+        <rect x="360" y="89" width="540" height="48" rx="7" class="bx"/>
+        <text x="380" y="118" class="sm">Structure B · 2 files · exception passed through</text>
+        <rect x="360" y="160" width="540" height="48" rx="7" class="bx"/>
+        <text x="380" y="189" class="sm">Structure C · 3 files · different test framework</text>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<!-- Key question -->
+<section class="slide" data-ch="Key question">
+  <div class="inner">
+    <p class="eyebrow">The question on the wall for two days</p>
+    <p class="statement">How do you make work with a <span>stochastic</span> tool reliable?</p>
+    <p class="attrib">Every block adds an answer.</p>
+  </div>
+</section>
+
+<!-- Funnel -->
+<section class="slide" data-ch="The model">
+  <div class="inner">
+    <p class="eyebrow">The answer in one picture</p>
+    <h2>Five things narrow the room to act.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 285" role="img" aria-label="A funnel: the agent's room to act is narrowed step by step by CLAUDE.md, brainstorming.md, spec.md, progress.md and hooks until the result is tightly defined">
+        <text x="0" y="16" class="hd">THE AGENT'S ROOM TO ACT</text>
+        <polygon points="0,30 860,115 860,145 0,230" class="bx"/>
+        <circle cx="28" cy="62" r="3.5" class="dot"/><circle cx="52" cy="150" r="3.5" class="dot"/>
+        <circle cx="38" cy="198" r="3.5" class="dot"/><circle cx="82" cy="96" r="3.5" class="dot"/>
+        <circle cx="96" cy="178" r="3.5" class="dot"/><circle cx="20" cy="122" r="3.5" class="dot"/>
+        <circle cx="112" cy="130" r="3.5" class="dot"/><circle cx="70" cy="58" r="3.5" class="dot"/>
+        <line x1="150" y1="45" x2="150" y2="215" class="gt g0"/>
+        <line x1="300" y1="60" x2="300" y2="200" class="gt g1"/>
+        <line x1="450" y1="75" x2="450" y2="185" class="gt g2"/>
+        <line x1="600" y1="90" x2="600" y2="170" class="gt g3"/>
+        <line x1="750" y1="104" x2="750" y2="156" class="gth g4"/>
+        <circle cx="880" cy="124" r="3.5" class="dota"/><circle cx="880" cy="130" r="3.5" class="dota"/><circle cx="880" cy="136" r="3.5" class="dota"/>
+        <text x="898" y="106" text-anchor="end" class="ac sm">Result</text>
+        <text x="150" y="254" text-anchor="middle" class="l0">CLAUDE.md</text><text x="150" y="272" text-anchor="middle" class="mu">rules</text>
+        <text x="300" y="254" text-anchor="middle" class="l1">brainstorming.md</text><text x="300" y="272" text-anchor="middle" class="mu">decision</text>
+        <text x="450" y="254" text-anchor="middle" class="l2">spec.md</text><text x="450" y="272" text-anchor="middle" class="mu">what &amp; why</text>
+        <text x="600" y="254" text-anchor="middle" class="l3">progress.md</text><text x="600" y="272" text-anchor="middle" class="mu">plan · tests · review</text>
+        <text x="750" y="254" text-anchor="middle" class="l4">Hooks</text><text x="750" y="272" text-anchor="middle" class="mu">technically enforced</text>
+      </svg>
+      <figcaption>Dashed: files the agent reads and usually follows. Solid: hooks that Claude Code runs every single time. The narrower the room, the closer three runs end up to each other.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- The chain -->
+<section class="slide" data-ch="The workflow">
+  <div class="inner">
+    <p class="eyebrow">The workflow</p>
+    <h2>The same path for every feature.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 340" role="img" aria-label="An idea via features.md or a ticket leads to one feature; the feature goes through brainstorming.md, spec.md, progress.md, review and wrap-up; review findings go back into progress.md; learnings from the wrap-up flow back into CLAUDE.md, skills, hooks and ARCHITECTURE.md, which apply at every step">
+        <defs><marker id="en-m-k" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker>
+        <marker id="en-m-ka" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker></defs>
+        <text x="0" y="16" class="hd">ENTRY POINT</text>
+        <rect x="0" y="28" width="300" height="50" rx="8" class="bx"/>
+        <text x="20" y="50" class="sm">Day 1 · your own idea</text>
+        <text x="20" y="68" class="mu">→ features.md</text>
+        <rect x="320" y="28" width="220" height="50" rx="8" class="bx"/>
+        <text x="340" y="50" class="sm">Day 2 · ticket</text>
+        <text x="340" y="68" class="mu">already is a feature</text>
+        <text x="560" y="58" class="mu">both lead to exactly one feature</text>
+        <path d="M430 78 V100 H150" class="ln"/>
+        <path d="M150 78 V100 H80 V124" class="ln" marker-end="url(#en-m-k)"/>
+        <text x="200" y="118" class="hd">PER FEATURE</text>
+        <rect x="0" y="128" width="156" height="64" rx="8" class="bxa"/>
+        <text x="78" y="156" text-anchor="middle" class="ac">brainstorming.md</text>
+        <text x="78" y="176" text-anchor="middle" class="mu">in several rounds</text>
+        <line x1="156" y1="160" x2="184" y2="160" class="ln" marker-end="url(#en-m-k)"/>
+        <rect x="186" y="128" width="156" height="64" rx="8" class="bxa"/>
+        <text x="264" y="156" text-anchor="middle" class="ac">spec.md</text>
+        <text x="264" y="176" text-anchor="middle" class="mu">what · why</text>
+        <line x1="342" y1="160" x2="370" y2="160" class="ln" marker-end="url(#en-m-k)"/>
+        <rect x="372" y="128" width="156" height="64" rx="8" class="bxa"/>
+        <text x="450" y="156" text-anchor="middle" class="ac">progress.md</text>
+        <text x="450" y="176" text-anchor="middle" class="mu">plan · code · tests</text>
+        <line x1="528" y1="160" x2="556" y2="160" class="ln" marker-end="url(#en-m-k)"/>
+        <rect x="558" y="128" width="156" height="64" rx="8" class="bx"/>
+        <text x="636" y="156" text-anchor="middle">Review</text>
+        <text x="636" y="176" text-anchor="middle" class="mu">new session</text>
+        <line x1="714" y1="160" x2="742" y2="160" class="ln" marker-end="url(#en-m-k)"/>
+        <rect x="744" y="128" width="156" height="64" rx="8" class="bx"/>
+        <text x="822" y="156" text-anchor="middle">Wrap-up</text>
+        <text x="822" y="176" text-anchor="middle" class="mu">PR · docs · done/</text>
+        <path d="M636 128 V112 H450 V124" class="dash" marker-end="url(#en-m-k)"/>
+        <text x="543" y="107" text-anchor="middle" class="mu">fix findings</text>
+        <rect x="0" y="268" width="900" height="58" rx="8" class="bx"/>
+        <text x="24" y="292" class="ac">CLAUDE.md / AGENTS.md</text>
+        <text x="250" y="292" class="ac">Skills</text>
+        <text x="360" y="292" class="ac">Hooks</text>
+        <text x="470" y="292" class="ac">ARCHITECTURE.md</text>
+        <text x="24" y="313" class="mu">Project knowledge, applies at every step and grows with every feature</text>
+        <path d="M80 266 V196" class="ln flow" marker-end="url(#en-m-k)"/>
+        <text x="92" y="236" class="mu">applies at every step</text>
+        <path d="M822 194 V264" class="lna flow" marker-end="url(#en-m-ka)"/>
+        <text x="810" y="236" text-anchor="end" class="sm ac">feed learnings back</text>
+      </svg>
+      <figcaption>One folder per feature under specs/open/. After the wrap-up it moves to specs/done/.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Structure -->
+<section class="slide" data-ch="The workflow">
+  <div class="inner">
+    <p class="eyebrow">Where the files live</p>
+    <h2>One folder per feature.</h2>
+    <div class="split tl">
+      <div>
+        <pre class="pcode tree">my-project/
+├── <b>CLAUDE.md</b>          <i>rules, conventions</i>
+├── <b>ARCHITECTURE.md</b>    <i>big picture of the system</i>
+├── features.md        <i>day 1: list of features</i>
+├── .claude/
+│   ├── settings.json  <i>hooks</i>
+│   └── skills/        <i>project skills</i>
+└── specs/
+    ├── open/
+    │   └── <b>csv-export/</b>
+    │       ├── brainstorming.md
+    │       ├── spec.md
+    │       └── progress.md
+    └── done/          <i>finished features</i></pre>
+      </div>
+      <div>
+        <ul class="plain" style="margin-top:0">
+          <li data-n="→"><span>The agent gets <b>one path</b> and has everything about this feature.</span></li>
+          <li data-n="→"><span><b>done/</b> keeps finished work out of sight. CLAUDE.md says this folder is only read on request.</span></li>
+          <li data-n="→"><span>On day 2 the folder is named after the ticket, e.g. <b>PROJ-123-csv-export/</b>. The ticket text goes at the top of brainstorming.md as the starting point.</span></li>
+          <li data-n="→"><span><b>ARCHITECTURE.md</b> sits in the root directory and is checked when each feature is wrapped up.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- features.md -->
+<section class="slide" data-ch="The workflow">
+  <div class="inner">
+    <p class="eyebrow">Step 1 · features.md</p>
+    <h2>Describe the idea, the agent derives the features.</h2>
+    <div class="split">
+      <div>
+        <p class="lede" style="margin-top:0">Including the features hidden in the idea that nobody mentioned explicitly: sign-in, data storage, export, error cases.</p>
+        <p class="notebox"><code>features.md</code> is the shared reference until there is a spec for every feature. After that it can be deleted. On day 2 the ticket takes over this role.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 01</span>
+        <pre class="pcode">Here is my project idea:
+<b>{{description, as detailed as possible}}</b>
+
+Derive the features this idea requires, including
+the ones I didn't mention explicitly. Write them
+to a features.md:
+
+<u>- one sentence per feature on what it does
+- order: what has to exist first
+- what can be left out of a first
+  working version</u>
+
+<b>Ask me the questions you need first.
+No spec yet, no code yet.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLAUDE.md -->
+<section class="slide" data-ch="The workflow">
+  <div class="inner">
+    <p class="eyebrow">Step 2 · CLAUDE.md</p>
+    <h2>What applies in every session goes into a file.</h2>
+    <div class="split">
+      <div>
+        <p class="lede" style="margin-top:0">Language, structure, conventions, test framework, forbidden paths. Everything the agent would otherwise have to guess again in every new session.</p>
+        <p class="notebox">Other agent tools use an <code>AGENTS.md</code> for this. Same content, same purpose.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 02</span>
+        <pre class="pcode">Let's create a CLAUDE.md that captures what
+you need to know every time you work in this
+project. Base it on features.md.
+
+Suggest:
+<u>- language, framework, test framework,
+  how to run and test
+- folder structure, including specs/open/ and
+  specs/done/ (only read done/ on request)
+- naming conventions and error handling
+- what must never be done</u>
+
+<b>Ask me before you write anything down.
+Short instructions, no prose.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- brainstorming -->
+<section class="slide" data-ch="The workflow">
+  <div class="inner">
+    <p class="eyebrow">Step 3 · brainstorming.md</p>
+    <h2>Brainstorming in several rounds</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 206" role="img" aria-label="Agent and human work on brainstorming.md in several rounds until no question is left open; only then spec.md is created">
+            <defs><marker id="en-m-b" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker>
+            <marker id="en-m-ba" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker></defs>
+            <rect x="0" y="20" width="190" height="56" rx="8" class="bxa"/>
+            <text x="95" y="44" text-anchor="middle" class="ac sm">brainstorming.md</text>
+            <text x="95" y="62" text-anchor="middle" class="mu">options · recommendation</text>
+            <rect x="240" y="20" width="190" height="56" rx="8" class="bx"/>
+            <text x="335" y="44" text-anchor="middle" class="sm">Human</text>
+            <text x="335" y="62" text-anchor="middle" class="mu">chooses, answers</text>
+            <path d="M190 38 H236" class="ln" marker-end="url(#en-m-b)"/>
+            <path d="M240 58 H194" class="ln" marker-end="url(#en-m-b)"/>
+            <text x="215" y="12" text-anchor="middle" class="mu">round 1, 2, 3 …</text>
+            <path d="M95 76 V140" class="lna" marker-end="url(#en-m-ba)"/>
+            <text x="107" y="114" class="gd sm">no open questions left</text>
+            <rect x="0" y="144" width="190" height="52" rx="8" class="bxa"/>
+            <text x="95" y="175" text-anchor="middle" class="ac sm">spec.md</text>
+          </svg>
+        </figure>
+        <p class="notebox">The agent recommends a solution, the human chooses and answers the questions right in the file. Then the agent adjusts options and recommendation.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 03</span>
+        <pre class="pcode">We're preparing this feature:
+<b>{{feature description or ticket text}}</b>
+
+Write specs/open/<b>{{feature}}</b>/brainstorming.md with
+<u>- starting point (the description above)
+- solution options with pros and cons
+- your recommendation and why
+- risks
+- open questions for me</u>
+
+We'll go through this in several rounds: I mark my
+choice and answer the questions in the file, then
+you adjust options and recommendation. Until no
+question is left open.
+
+<b>No spec yet, no code yet.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- spec -->
+<section class="slide" data-ch="The workflow">
+  <div class="inner">
+    <p class="eyebrow">Step 4 · spec.md</p>
+    <h2>Anatomy of a spec</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 240" role="img" aria-label="A spec consists of intent, scope, non-goals, numbered acceptance criteria and constraints">
+            <rect x="0" y="6" width="430" height="226" rx="9" class="bx"/>
+            <text x="20" y="38" class="ac">Intent</text><text x="170" y="38" class="mu">Why does this exist?</text>
+            <line x1="20" y1="50" x2="410" y2="50" class="dash"/>
+            <text x="20" y="78" class="ac">Scope</text><text x="170" y="78" class="mu">What is included?</text>
+            <line x1="20" y1="90" x2="410" y2="90" class="dash"/>
+            <text x="20" y="118" class="ac">Non-goals</text><text x="170" y="118" class="mu">What explicitly not?</text>
+            <line x1="20" y1="130" x2="410" y2="130" class="dash"/>
+            <text x="20" y="158" class="ac">Acceptance criteria</text>
+            <text x="20" y="178" class="mu">numbered · individually testable · observable behaviour</text>
+            <line x1="20" y1="190" x2="410" y2="190" class="dash"/>
+            <text x="20" y="218" class="ac">Constraints</text><text x="170" y="218" class="mu">Which limits apply?</text>
+          </svg>
+        </figure>
+        <p class="notebox">Open questions don't belong in the spec. They are settled during brainstorming. The spec is only written once nothing is left open there.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 04</span>
+        <pre class="pcode">First check whether any questions are still
+open in brainstorming.md. If so: list them
+and stop.
+
+Otherwise create spec.md in the same folder:
+<u>- Intent: why does this exist?
+- Scope: what is included?
+- Non-goals: what explicitly not?
+- Acceptance criteria: numbered, individually
+  testable, written as observable behaviour
+- Constraints: technical and business limits</u>
+
+Describe the what and the why, never the how.
+If an acceptance criterion can't be checked
+objectively, rewrite it.
+
+<b>No code yet.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Skills -->
+<section class="slide" data-ch="Skills">
+  <div class="inner">
+    <p class="eyebrow">Step 5 · deriving skills</p>
+    <h2>The agent reads the process from your own files.</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 150" role="img" aria-label="From brainstorming.md and spec.md the agent reconstructs the process and saves it as a skill; next time the input is an entry from features.md or a ticket">
+            <defs><marker id="en-m-sk" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker>
+            <marker id="en-m-sk2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker></defs>
+            <rect x="0" y="10" width="170" height="36" rx="7" class="bx"/><text x="85" y="33" text-anchor="middle" class="sm">brainstorming.md</text>
+            <rect x="0" y="54" width="170" height="36" rx="7" class="bx"/><text x="85" y="77" text-anchor="middle" class="sm">spec.md</text>
+            <path d="M170 50 H226" class="lna" marker-end="url(#en-m-sk)"/>
+            <rect x="230" y="18" width="200" height="64" rx="8" class="bxa"/>
+            <text x="330" y="46" text-anchor="middle" class="ac sm">a skill</text>
+            <text x="330" y="66" text-anchor="middle" class="mu">.claude/skills/</text>
+            <path d="M330 110 V86" class="dash" marker-end="url(#en-m-sk2)"/>
+            <text x="330" y="126" text-anchor="middle" class="mu">input next time:</text>
+            <text x="330" y="144" text-anchor="middle" class="sm">features.md or a ticket</text>
+          </svg>
+        </figure>
+        <p class="notebox">The skill starts at brainstorming. What comes before is interchangeable: an entry from features.md on day 1, a ticket on day 2.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 05</span>
+        <pre class="pcode">For feature <b>{{feature}}</b> we went this way:
+brainstorming.md in several rounds, then spec.md.
+
+Read both files and reconstruct the process from
+them: which steps, which questions to me, which
+structure in the result.
+
+Turn it into a skill under
+.claude/skills/<b>{{name}}</b>/SKILL.md. The skill's
+input is a feature description, whether it comes
+from features.md or from a ticket.
+
+<b>Rely on the files, not on your memory of
+our conversation.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Implementation -->
+<section class="slide" data-ch="Implementation">
+  <div class="inner">
+    <p class="eyebrow">Step 6 · implementation</p>
+    <h2>First the plan in progress.md, then the code.</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 190" role="img" aria-label="Across two sessions the chat context is lost while progress.md carries the working state forward">
+            <text x="0" y="14" class="hd">SESSION 1</text>
+            <text x="250" y="14" class="hd">SESSION 2</text>
+            <rect x="0" y="26" width="170" height="44" rx="7" class="bx"/>
+            <text x="85" y="53" text-anchor="middle" class="sm">context window</text>
+            <rect x="250" y="26" width="180" height="44" rx="7" class="bx"/>
+            <text x="340" y="53" text-anchor="middle" class="mu">empty</text>
+            <path d="M170 48 H240" class="dash"/>
+            <text x="205" y="40" text-anchor="middle" class="bd sm">✕</text>
+            <rect x="0" y="96" width="170" height="44" rx="7" class="bxa"/>
+            <text x="85" y="123" text-anchor="middle" class="ac sm">progress.md</text>
+            <rect x="250" y="96" width="180" height="44" rx="7" class="bxa"/>
+            <text x="340" y="123" text-anchor="middle" class="ac sm">still there</text>
+            <path d="M170 118 H240" class="lna"/>
+            <text x="0" y="172" class="mu">plan · completed steps · decisions · open items</text>
+          </svg>
+        </figure>
+        <p class="notebox"><code>spec.md</code> stays unchanged and is the yardstick for the review. <code>progress.md</code> changes all the time. If you want to read the plan before any code is written, start in plan mode.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 06</span>
+        <pre class="pcode">Implement specs/open/<b>{{feature}}</b>/spec.md.
+
+First write a plan as a checklist in progress.md:
+<u>- steps in order
+- for each step the acceptance criterion it
+  fulfils and how it is tested
+- sections "Decisions", "Open items"
+  and "Review"</u>
+
+Then work through the checklist. After each
+step: run the tests, tick it off, note
+decisions.
+
+<b>If something is missing: don't guess. Add it
+under "Open items" and ask me.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Review -->
+<section class="slide" data-ch="Review">
+  <div class="inner">
+    <p class="eyebrow">Step 7 · review</p>
+    <h2>Review in a new session, in three stages.</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 300" role="img" aria-label="Review in three stages: first the tests run; if they fail, the review stops. Otherwise the check against the spec and the technical quality follow; findings go into progress.md">
+            <defs><marker id="en-m-rv" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker>
+            <marker id="en-m-rva" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker></defs>
+            <rect x="0" y="10" width="250" height="50" rx="8" class="bxa"/>
+            <text x="20" y="32" class="ac sm">1 · Tests</text>
+            <text x="20" y="49" class="mu">day to day: + linter, trivy …</text>
+            <path d="M250 35 H296" class="ln" marker-end="url(#en-m-rv)"/>
+            <text x="273" y="27" text-anchor="middle" class="bd sm">red</text>
+            <rect x="300" y="10" width="130" height="50" rx="8" class="bx"/>
+            <text x="365" y="32" text-anchor="middle" class="bd sm">stop</text>
+            <text x="365" y="49" text-anchor="middle" class="mu">report only that</text>
+            <path d="M125 60 V86" class="ln" marker-end="url(#en-m-rv)"/>
+            <text x="137" y="78" class="gd sm">green</text>
+            <rect x="0" y="90" width="250" height="50" rx="8" class="bx"/>
+            <text x="20" y="112" class="sm">2 · Spec</text>
+            <text x="20" y="129" class="mu">criteria met? non-goals?</text>
+            <path d="M125 140 V166" class="ln" marker-end="url(#en-m-rv)"/>
+            <rect x="0" y="170" width="250" height="50" rx="8" class="bx"/>
+            <text x="20" y="192" class="sm">3 · Technical quality</text>
+            <text x="20" y="209" class="mu">SOLID · DRY</text>
+            <path d="M125 220 V246" class="lna" marker-end="url(#en-m-rva)"/>
+            <rect x="0" y="250" width="250" height="42" rx="8" class="bxa"/>
+            <text x="20" y="276" class="ac sm">findings → progress.md</text>
+          </svg>
+        </figure>
+        <p class="notebox">The new session is deliberate: the agent that wrote the code checks against its own understanding. A fresh agent checks against the spec.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 07 · in a new session</span>
+        <pre class="pcode">Check specs/open/<b>{{feature}}</b>/ against
+spec.md. You did not write the code.
+
+<u>1. Run the tests. If they fail, stop and
+   report only that.
+2. Go through every acceptance criterion: is it
+   met, and how can you tell? Anything you
+   can't demonstrate is a finding.
+   Was anything built that isn't in the spec,
+   or was a non-goal violated?
+3. Check against SOLID and DRY. Report only
+   concrete violations, with reasoning.</u>
+
+<b>Write the findings as a checklist under
+"Review" in progress.md. Don't change anything yet.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Green test -->
+<section class="slide" data-ch="Review">
+  <div class="inner">
+    <p class="eyebrow">Why a fresh agent checks</p>
+    <h2>A green test that misses the criterion.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 236" role="img" aria-label="In the same session the test only checks the code and is green. In a new session a fresh agent reads spec and code and finds a criterion that is not met">
+        <defs><marker id="en-m-g" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker>
+        <marker id="en-m-ga" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--flow)"/></marker></defs>
+        <text x="0" y="16" class="hd">SAME SESSION</text>
+        <rect x="0" y="28" width="160" height="50" rx="8" class="bx"/>
+        <text x="80" y="58" text-anchor="middle" class="sm">Code</text>
+        <rect x="200" y="28" width="160" height="50" rx="8" class="bx"/>
+        <text x="280" y="58" text-anchor="middle" class="sm">Test</text>
+        <path d="M200 53 H166" class="ln" marker-end="url(#en-m-g)"/>
+        <text x="180" y="44" text-anchor="middle" class="mu">checks</text>
+        <path d="M360 53 H416" class="ln" marker-end="url(#en-m-g)"/>
+        <rect x="420" y="28" width="220" height="50" rx="8" class="bx"/>
+        <text x="530" y="58" text-anchor="middle" class="gd">✓ all tests green</text>
+        <text x="660" y="58" class="mu">both from the same session</text>
+        <text x="0" y="118" class="hd">NEW SESSION</text>
+        <rect x="0" y="130" width="160" height="40" rx="7" class="bxa"/>
+        <text x="80" y="155" text-anchor="middle" class="ac sm">spec.md</text>
+        <rect x="0" y="180" width="160" height="40" rx="7" class="bx"/>
+        <text x="80" y="205" text-anchor="middle" class="sm">Code</text>
+        <path d="M160 150 L236 166" class="ln" marker-end="url(#en-m-g)"/>
+        <path d="M160 200 L236 184" class="ln" marker-end="url(#en-m-g)"/>
+        <rect x="240" y="140" width="220" height="70" rx="8" class="bxa"/>
+        <text x="350" y="170" text-anchor="middle" class="ac">fresh agent</text>
+        <text x="350" y="190" text-anchor="middle" class="mu">checks criterion by criterion</text>
+        <path d="M460 175 H516" class="lna" marker-end="url(#en-m-ga)"/>
+        <rect x="520" y="150" width="240" height="50" rx="8" class="bx"/>
+        <text x="640" y="180" text-anchor="middle" class="bd sm">criterion 3 not met</text>
+      </svg>
+      <figcaption>Tests check what the code does. Whether the code does what the spec asks for is checked by an agent with a fresh context.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Fix findings -->
+<section class="slide" data-ch="Review">
+  <div class="inner">
+    <p class="eyebrow">Step 8 · fixing findings</p>
+    <h2>Fix, tick off, check again.</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 180" role="img" aria-label="The review writes findings into progress.md; they get fixed and ticked off, then the review runs again until nothing is left open">
+            <defs><marker id="en-m-f" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker></defs>
+            <rect x="0" y="20" width="180" height="48" rx="8" class="bx"/>
+            <text x="90" y="49" text-anchor="middle" class="sm">Review</text>
+            <path d="M180 44 H246" class="ln" marker-end="url(#en-m-f)"/>
+            <rect x="250" y="20" width="180" height="48" rx="8" class="bxa"/>
+            <text x="340" y="41" text-anchor="middle" class="ac sm">progress.md</text>
+            <text x="340" y="58" text-anchor="middle" class="mu">findings as a checklist</text>
+            <path d="M340 68 V116" class="ln" marker-end="url(#en-m-f)"/>
+            <rect x="250" y="120" width="180" height="48" rx="8" class="bx"/>
+            <text x="340" y="141" text-anchor="middle" class="sm">fix</text>
+            <text x="340" y="158" text-anchor="middle" class="mu">tests · tick off</text>
+            <path d="M250 144 H90 V72" class="dash" marker-end="url(#en-m-f)"/>
+            <text x="100" y="118" class="mu">check again,</text>
+            <text x="100" y="134" class="mu">until nothing is open</text>
+          </svg>
+        </figure>
+        <p class="notebox">Single small findings can also be fixed right away. With several, the list makes sure nothing gets lost when the session ends.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 08</span>
+        <pre class="pcode">Work through the findings under "Review" in
+specs/open/<b>{{feature}}</b>/progress.md.
+
+<u>- One finding at a time.
+- After each one: run the tests, tick it off.
+- If a finding can only be fixed by violating
+  the spec: don't guess, ask me.</u>
+
+<b>When everything is ticked off: let me know,
+then the review runs again.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Wrap-up -->
+<section class="slide" data-ch="Wrap-up">
+  <div class="inner">
+    <p class="eyebrow">Step 9 · wrap-up</p>
+    <h2>Whatever would happen again becomes a rule.</h2>
+    <div class="split">
+      <div>
+        <ul class="plain" style="margin-top:0">
+          <li data-n="01"><span>Check <b>ARCHITECTURE.md</b> and update it where the feature changed something</span></li>
+          <li data-n="02"><span>PR description from spec.md and progress.md</span></li>
+          <li data-n="03"><span>Move the folder from <b>specs/open/</b> to <b>specs/done/</b></span></li>
+          <li data-n="04"><span>Feed learnings back: into CLAUDE.md, a skill or a hook</span></li>
+        </ul>
+        <p class="notebox">A finding that ends up as a linter rule won't show up in the next review.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 09 · prompt 10 for 01–03 in the "Prompts" tab</span>
+        <pre class="pcode">Read the review findings in
+specs/open/<b>{{feature}}</b>/progress.md.
+
+Which of them would come up again in another
+feature?
+
+For each one, suggest where it gets caught
+in the future:
+<u>- as a rule in CLAUDE.md
+- as a step in a skill
+- as a check in a linter or hook</u>
+
+<b>Don't change anything yet.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Day 2 -->
+<section class="slide" data-ch="Day 2">
+  <div class="inner">
+    <p class="eyebrow">Day 2</p>
+    <h2>In existing code, understanding comes first.</h2>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 200" role="img" aria-label="Day 1 compared with day 2: in a new project you build and then review, in existing code understanding and securing come before the change">
+        <text x="0" y="16" class="hd">DAY 1 · NEW PROJECT</text>
+        <rect x="0" y="30" width="900" height="50" rx="8" class="bx"/>
+        <text x="24" y="60" class="sm">Build</text>
+        <text x="200" y="60" class="sm">→ Review</text>
+        <text x="0" y="118" class="hd">DAY 2 · EXISTING REPO</text>
+        <rect x="0" y="132" width="900" height="64" rx="8" class="bxa"/>
+        <text x="24" y="158" class="ac">Understand</text>
+        <text x="200" y="158" class="ac">→ Secure</text>
+        <text x="380" y="158" class="ac">→ Change</text>
+        <text x="560" y="158" class="ac">→ Review</text>
+        <text x="24" y="180" class="sm">ARCHITECTURE.md · CLAUDE.md · affected places · missing tests</text>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<!-- Skills global -->
+<section class="slide" data-ch="Day 2">
+  <div class="inner">
+    <p class="eyebrow">Day 2 · bringing yesterday's skills along</p>
+    <h2>A skill applies where it lives.</h2>
+    <div class="cols c3">
+      <div class="card">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg></div>
+        <span class="k">Project</span>
+        <h4><code>.claude/skills/</code></h4>
+        <p>Lives in the repo. Applies to everyone working in this repo. This is where the day 1 skills are.</p>
+      </div>
+      <div class="card hi">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /> <circle cx="12" cy="7" r="4" /></svg></div>
+        <span class="k">Personal</span>
+        <h4><code>~/.claude/skills/</code></h4>
+        <p>Lives in your home directory. Applies in all your projects, including today's company repo.</p>
+      </div>
+      <div class="card">
+        <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></svg></div>
+        <span class="k">Organisation</span>
+        <h4>Plugin</h4>
+        <p>Several skills bundled and distributed to a team or a whole organisation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="slide" data-ch="Day 2">
+  <div class="inner">
+    <p class="eyebrow">Day 2 · understanding</p>
+    <h2>ARCHITECTURE.md: the big picture of the system.</h2>
+    <div class="split">
+      <div>
+        <figure style="margin-top:0">
+          <svg class="dg" viewBox="0 0 430 300" role="img" aria-label="Structure of an ARCHITECTURE.md: overview, modules, data flows, technologies, patterns, security and legacy">
+            <rect x="0" y="6" width="430" height="290" rx="9" class="bx"/>
+            <text x="20" y="34" class="ac">Overview</text><text x="170" y="34" class="mu">What does the system do?</text>
+            <line x1="20" y1="46" x2="410" y2="46" class="dash"/>
+            <text x="20" y="74" class="ac">Modules</text><text x="170" y="74" class="mu">Who is responsible for what?</text>
+            <line x1="20" y1="86" x2="410" y2="86" class="dash"/>
+            <text x="20" y="114" class="ac">Data flows</text><text x="170" y="114" class="mu">Where in, where out?</text>
+            <line x1="20" y1="126" x2="410" y2="126" class="dash"/>
+            <text x="20" y="154" class="ac">Technologies</text><text x="170" y="154" class="mu">Languages, frameworks, DBs</text>
+            <line x1="20" y1="166" x2="410" y2="166" class="dash"/>
+            <text x="20" y="194" class="ac">Patterns</text><text x="170" y="194" class="mu">Which patterns, where?</text>
+            <line x1="20" y1="206" x2="410" y2="206" class="dash"/>
+            <text x="20" y="234" class="ac">Security</text><text x="170" y="234" class="mu">Auth, secrets, input</text>
+            <line x1="20" y1="246" x2="410" y2="246" class="dash"/>
+            <text x="20" y="274" class="ac">Legacy</text><text x="170" y="274" class="mu">What has grown over time?</text>
+          </svg>
+        </figure>
+        <p class="notebox">The agent delivers a draft. Before it goes into the repo, someone who knows the system reviews it. Every later session builds on this file and inherits its mistakes too.</p>
+      </div>
+      <div>
+        <span class="pk">Prompt 11 · for any repo, including yesterday's</span>
+        <pre class="pcode">Explore this repository and write
+ARCHITECTURE.md:
+
+<u>- Overview: what does the system do, for whom?
+- Modules and their responsibilities
+- Data flows: where does data come in, go out
+- Technologies: languages, frameworks,
+  databases, infrastructure
+- Patterns: which architecture and design
+  patterns are used where
+- Security: authentication, authorisation,
+  handling of secrets and input
+- Legacy: what looks like it grew over time</u>
+
+Also create a Mermaid diagram of the
+modules.</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Securing -->
+<section class="slide" data-ch="Day 2">
+  <div class="inner">
+    <p class="eyebrow">Day 2 · securing</p>
+    <h2>Two questions before implementing.</h2>
+    <div class="split">
+      <div>
+        <div class="cols" style="margin-top:0">
+          <div class="card">
+            <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="16" y="16" width="6" height="6" rx="1" /> <rect x="2" y="16" width="6" height="6" rx="1" /> <rect x="9" y="2" width="6" height="6" rx="1" /> <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" /> <path d="M12 12V8" /></svg></div>
+            <span class="k">Question 1</span>
+            <h4>What is affected?</h4>
+            <p>Every place that calls the code to be changed or depends on it.</p>
+          </div>
+          <div class="card hi">
+            <div class="ict"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> <path d="m9 12 2 2 4-4" /></svg></div>
+            <span class="k">Question 2</span>
+            <h4>Is it covered?</h4>
+            <p>Only what the change touches gets covered. Often one test at interface level that runs through the affected flow once is enough.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="pk">Prompt 14</span>
+        <pre class="pcode">Read spec.md in specs/open/<b>{{feature}}</b>/,
+CLAUDE.md and ARCHITECTURE.md.
+
+Before we implement, answer two questions:
+<u>1. What is affected? Every place that calls
+   the code to be changed or depends on it.
+2. Is it covered? Which of these places are
+   covered by tests?</u>
+
+Where tests are missing: suggest the smallest
+safety net that covers the affected flow,
+e.g. one test at interface level instead
+of many unit tests.
+
+<b>Result in progress.md under "Upfront".
+No code yet.</b></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Hooks -->
+<section class="slide" data-ch="Hooks">
+  <div class="inner">
+    <p class="eyebrow">Outlook · hooks</p>
+    <h2>Hooks keep the agent on track technically.</h2>
+    <p class="lede">The agent follows instructions in CLAUDE.md and the spec with high probability. A hook is a program that runs every single time.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 900 112" role="img" aria-label="Hooks act in three places: while the agent works, on commit and in CI">
+        <defs><marker id="en-m-h" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--dline)"/></marker></defs>
+        <text x="0" y="16" class="hd">WHERE HOOKS ACT</text>
+        <rect x="0" y="30" width="280" height="74" rx="8" class="bxa"/>
+        <g class="dic" transform="translate(244 40) scale(1)"><path d="M12 8V4H8" /> <rect width="16" height="12" x="4" y="8" rx="2" /> <path d="M2 14h2" /> <path d="M20 14h2" /> <path d="M15 13v2" /> <path d="M9 13v2" /></g>
+        <text x="20" y="56" class="ac">while the agent works</text>
+        <text x="20" y="76" class="mu">e.g. formatter after every change</text>
+        <text x="20" y="92" class="mu">or tests when the agent is done</text>
+        <path d="M280 67 H306" class="ln" marker-end="url(#en-m-h)"/>
+        <rect x="310" y="30" width="280" height="74" rx="8" class="bx"/>
+        <g class="dic" transform="translate(554 40) scale(1)"><circle cx="12" cy="12" r="3" /> <line x1="3" x2="9" y1="12" y2="12" /> <line x1="15" x2="21" y1="12" y2="12" /></g>
+        <text x="330" y="56">on commit</text>
+        <text x="330" y="76" class="mu">e.g. gitleaks, linter</text>
+        <path d="M590 67 H616" class="ln" marker-end="url(#en-m-h)"/>
+        <rect x="620" y="30" width="280" height="74" rx="8" class="bx"/>
+        <g class="dic" transform="translate(864 40) scale(1)"><rect width="20" height="8" x="2" y="2" rx="2" ry="2" /> <rect width="20" height="8" x="2" y="14" rx="2" ry="2" /> <line x1="6" x2="6.01" y1="6" y2="6" /> <line x1="6" x2="6.01" y1="18" y2="18" /></g>
+        <text x="640" y="56">in CI</text>
+        <text x="640" y="76" class="mu">the same checks, mandatory</text>
+      </svg>
+      <figcaption>Prompt 15 in the library helps with the setup.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Hooks example -->
+<section class="slide" data-ch="Hooks">
+  <div class="inner">
+    <p class="eyebrow">Outlook · two examples</p>
+    <h2>Both live in .claude/settings.json.</h2>
+    <pre class="pcode tree" style="margin-top:22px">{
+  <span class="t">"permissions": {
+    "deny": ["Read(./.env)", "Edit(./.env)"]
+  },</span>
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{
+        "type": "command",
+        "command": <b>"jq -r '.tool_input.file_path' | xargs npx prettier --write"</b>
+      }]
+    }]
+  }
+}</pre>
+    <div class="cols c2">
+      <div class="card tl">
+        <span class="k">Example 1 · locking .env</span>
+        <p>No hook needed. A <code>deny</code> rule forbids Claude Code's file tools from reading or editing the file.</p>
+      </div>
+      <div class="card hi">
+        <span class="k a">Example 2 · formatter after every change</span>
+        <p>After every edit or write, Claude Code tells the command which file it was. <code>jq</code> reads the path, <code>prettier</code> formats exactly that file.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Agenda 1 -->
+<section class="slide" data-ch="Agenda">
+  <div class="inner">
+    <p class="eyebrow">Agenda · day 1</p>
+    <h2>Your own project</h2>
+    <ol class="steps">
+      <li>Introductions</li>
+      <li>Terms and how agents work</li>
+      <li>Claude Code basics</li>
+      <li>Project pitches</li>
+      <li class="mark">Freestyle sprint: 20 minutes, no rules</li>
+      <li>features.md</li>
+      <li>CLAUDE.md</li>
+      <li>brainstorming.md in several rounds</li>
+      <li>spec.md</li>
+      <li class="mark">Let the agent derive a skill</li>
+      <li>Implementation with progress.md</li>
+      <li>Review in a new session</li>
+      <li>Fixing findings, wrap-up</li>
+      <li>App demos</li>
+    </ol>
+  </div>
+</section>
+
+<!-- Agenda 2 -->
+<section class="slide" data-ch="Agenda">
+  <div class="inner">
+    <p class="eyebrow">Agenda · day 2</p>
+    <h2>The real task</h2>
+    <ol class="steps">
+      <li class="mark">Make yesterday's skills global</li>
+      <li>The real task: repo and ticket</li>
+      <li class="mark">Create and review ARCHITECTURE.md</li>
+      <li>CLAUDE.md for the existing repo</li>
+      <li>brainstorming.md → spec.md with the skill</li>
+      <li>Clarify affected places and coverage</li>
+      <li>Implementation with progress.md</li>
+      <li>Review in a new session</li>
+      <li>Fixing findings, wrap-up, feeding learnings back</li>
+      <li>Outlook: hooks with two examples</li>
+      <li>Which skills belong in the team repo?</li>
+      <li>Feedback round</li>
+    </ol>
+  </div>
+</section>
+
+<!-- Feedback -->
+<section class="slide" data-ch="Feedback">
+  <div class="inner">
+    <p class="eyebrow">To finish</p>
+    <h2>Feedback round</h2>
+    <ul class="plain" style="margin-top:30px">
+      <li data-n="→"><span>What are you taking away?</span></li>
+      <li data-n="→"><span>What was missing for you?</span></li>
+      <li data-n="→"><span>What would you leave out?</span></li>
+    </ul>
+  </div>
+</section>
+
+</div><!-- /deck -->
+
+<!-- ============ PROMPTS ============ -->
+<div class="view prompts" id="prompts-en" hidden>
+  <div class="pl-head">
+    <p class="eyebrow">To take home</p>
+    <h2>Prompt library</h2>
+    <p class="lede">One prompt for every step of the workflow. Save them, adapt them, turn them into your own skills. Replace the <span class="ph-note">{{placeholders}}</span>.</p>
+    <div class="rules">
+      <div class="rule"><span>01</span><div>Where something is unclear, <b>the agent asks</b>.</div></div>
+      <div class="rule"><span>02</span><div>Every prompt says <b>where to stop</b>: no code yet, don't change anything yet.</div></div>
+      <div class="rule"><span>03</span><div>Results go <b>into files</b> so the next session can build on them.</div></div>
+    </div>
+  </div>
+
+  <p class="plabel">Day 1 · The workflow</p>
+  <div class="pl-grid">
+
+  <details class="prompt" open>
+    <summary><span class="pnum">01</span><span class="ptitle">features.md from the project idea</span><span class="pwhen">project start</span></summary>
+    <div class="pbody">
+      <div class="pnote">The agent also derives the features hidden in the idea without being named. The file is the shared reference until there is a spec for every feature.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Here is my project idea:
+<mark>{{description, as detailed as possible}}</mark>
+
+Derive the features this idea requires, including the ones
+I didn't mention explicitly. Write them to a features.md:
+- one sentence per feature on what it does
+- order: what has to exist first
+- what can be left out of a first working version
+
+Ask me the questions you need first.
+No spec yet, no code yet.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">02</span><span class="ptitle">CLAUDE.md for a new project</span><span class="pwhen">once per repo</span></summary>
+    <div class="pbody">
+      <div class="pnote">Other agent tools read the same content from an <code>AGENTS.md</code>.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Let's create a CLAUDE.md that captures what you need to know
+every time you work in this project. Base it on features.md.
+
+Suggest:
+- language, framework, test framework, how to run and test
+- folder structure, including specs/open/ for ongoing and specs/done/
+  for finished features (only read specs/done/ on request)
+- naming conventions and error handling
+- what must never be done
+
+Ask me before you write anything down. Short instructions, no prose.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">03</span><span class="ptitle">brainstorming.md in several rounds</span><span class="pwhen">per feature</span></summary>
+    <div class="pbody">
+      <div class="pnote">The starting point can be an entry from features.md or a ticket text. <b>The rounds continue until no question is left open.</b></div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>We're preparing this feature:
+<mark>{{feature description or ticket text}}</mark>
+
+Write specs/open/<mark>{{feature}}</mark>/brainstorming.md with
+- starting point (the description above)
+- solution options with pros and cons
+- your recommendation and why
+- risks
+- open questions for me
+
+We'll go through this in several rounds: I mark my choice and answer
+the questions in the file, then you adjust options and recommendation.
+Until no question is left open.
+
+No spec yet, no code yet.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">04</span><span class="ptitle">spec.md</span><span class="pwhen">when nothing is open</span></summary>
+    <div class="pbody">
+      <div class="pnote">The first paragraph protects the order: <b>as long as anything is open in the brainstorming, no spec gets written.</b></div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>First check whether any questions are still open in
+specs/open/<mark>{{feature}}</mark>/brainstorming.md. If so: list them and stop.
+
+Otherwise create spec.md in the same folder with these sections:
+- Intent: why does this exist?
+- Scope: what is included?
+- Non-goals: what explicitly not?
+- Acceptance criteria: numbered, each individually testable,
+  written as observable behaviour
+- Constraints: technical and business limits
+
+Describe the what and the why, never the how.
+If an acceptance criterion can't be checked objectively, rewrite it.
+
+No code yet.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">05</span><span class="ptitle">Derive a skill from your own process</span><span class="pwhen">after the first spec</span></summary>
+    <div class="pbody">
+      <div class="pnote">After several hours of work the beginning of the conversation is no longer fully in context. <b>The files are.</b></div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>For feature <mark>{{feature}}</mark> we went this way:
+brainstorming.md in several rounds, then spec.md.
+
+Read both files and reconstruct the process from them: which steps,
+which questions to me, which structure in the result.
+
+Turn it into a skill under .claude/skills/<mark>{{name}}</mark>/SKILL.md.
+The skill's input is a feature description, whether it comes from
+features.md or from a ticket.
+
+Rely on the files, not on your memory of our conversation.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">06</span><span class="ptitle">Implementation with progress.md</span><span class="pwhen">once the spec is done</span></summary>
+    <div class="pbody">
+      <div class="pnote">The plan sits at the top of progress.md and gets ticked off there. <b>If you want to read it before any code is written, start in plan mode.</b></div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Implement specs/open/<mark>{{feature}}</mark>/spec.md.
+
+First write a plan as a checklist in progress.md:
+- steps in order
+- for each step the acceptance criterion it fulfils
+  and how it is tested
+- sections "Decisions", "Open items" and "Review"
+
+Then work through the checklist. After each step: run the tests,
+tick it off, note decisions.
+
+If something is missing: don't guess. Add it under "Open items"
+and ask me.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">07</span><span class="ptitle">Review against the spec</span><span class="pwhen">in a new session</span></summary>
+    <div class="pbody">
+      <div class="pnote">In a new session the agent checks against the spec without the knowledge from the implementation. Day to day, linters, Checkstyle and security scans such as trivy belong before step 1.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Check specs/open/<mark>{{feature}}</mark>/ against spec.md.
+You did not write the code.
+
+1. Run the tests. If they fail, stop and report only that.
+2. Go through every acceptance criterion: is it met, and how can you
+   tell? Anything you can't demonstrate is a finding.
+   Was anything built that isn't in the spec, or was a non-goal
+   violated?
+3. Check against SOLID and DRY. Report only concrete violations,
+   with reasoning.
+
+Write the findings as a checklist under "Review" in progress.md.
+Don't change anything yet.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">08</span><span class="ptitle">Fixing findings</span><span class="pwhen">after the review</span></summary>
+    <div class="pbody">
+      <div class="pnote">Once all findings are ticked off, the review runs again until nothing is left open.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Work through the findings under "Review" in
+specs/open/<mark>{{feature}}</mark>/progress.md.
+
+- One finding at a time.
+- After each one: run the tests, tick it off.
+- If a finding can only be fixed by violating the spec:
+  don't guess, ask me.
+
+When everything is ticked off: let me know, then the review runs again.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">09</span><span class="ptitle">Feeding learnings back</span><span class="pwhen">after the review</span></summary>
+    <div class="pbody">
+      <div class="pnote">A finding that ends up as a linter rule or hook <b>won't show up in the next review</b>.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Read the review findings in specs/open/<mark>{{feature}}</mark>/progress.md.
+
+Which of them would come up again in another feature?
+
+For each one, suggest where it gets caught in the future:
+- as a rule in CLAUDE.md
+- as a step in a skill
+- as a check in a linter or hook
+
+Don't change anything yet.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">10</span><span class="ptitle">Wrap-up: docs, PR, archive</span><span class="pwhen">feature done</span></summary>
+    <div class="pbody">
+      <div class="pnote">This is where <code>ARCHITECTURE.md</code> gets maintained, every time a feature is done.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Feature <mark>{{feature}}</mark> is implemented and reviewed.
+
+1. Check whether ARCHITECTURE.md is still accurate and update it
+   where the feature changed something.
+2. Write a PR description from spec.md and progress.md.
+3. Move specs/open/<mark>{{feature}}</mark>/ to specs/done/.</pre></div>
+    </div>
+  </details>
+
+  </div>
+
+  <p class="plabel">Day 2 · Existing code</p>
+  <div class="pl-grid">
+
+  <details class="prompt">
+    <summary><span class="pnum">11</span><span class="ptitle">Create ARCHITECTURE.md</span><span class="pwhen">for any repo</span></summary>
+    <div class="pbody">
+      <div class="pnote">The agent delivers a draft. <b>Before it goes into the repo, someone who knows the system reviews it.</b> Every later session builds on it.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Explore this repository and write ARCHITECTURE.md:
+
+- Overview: what does the system do, for whom?
+- Modules and their responsibilities
+- Data flows: where does data come in, go out, what's in between
+- Technologies: languages, frameworks, databases, infrastructure
+- Patterns: which architecture and design patterns are used where
+- Security: authentication, authorisation, handling of secrets
+  and input
+- Legacy: what looks like it grew over time
+
+Also create a Mermaid diagram of the modules.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">12</span><span class="ptitle">CLAUDE.md for an existing repo</span><span class="pwhen">after ARCHITECTURE.md</span></summary>
+    <div class="pbody">
+      <div class="pnote">It describes <b>the conventions that actually apply</b>. Improvement wishes belong in a ticket.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Read ARCHITECTURE.md and the last 50 commits.
+
+Create a CLAUDE.md describing the conventions that actually apply here:
+
+- How are things named, structured, tested here?
+- Which patterns repeat, even if they aren't pretty?
+- Where does the repo contradict itself?
+  (Phrase it as a question to me, don't resolve it yourself.)
+- What must not be touched under any circumstances?
+
+Describe the current state. Suggestions for improvement don't belong here.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">13</span><span class="ptitle">Trace a flow through the system</span><span class="pwhen">before your own change</span></summary>
+    <div class="pbody">
+      <div class="pnote">The third marker directly gives you the affected places for prompt 14.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>I want to understand how <mark>{{process}}</mark> runs through this system.
+
+Trace the path from the entry point to the end and show me the chain:
+file and function → what happens there → where it goes next.
+
+Mark:
+- places where the path branches
+- places where state is changed
+- places I would have to touch to implement <mark>{{planned change}}</mark>
+
+Also create a Mermaid sequence diagram of it.</pre></div>
+    </div>
+  </details>
+
+  <details class="prompt">
+    <summary><span class="pnum">14</span><span class="ptitle">Affected places and coverage</span><span class="pwhen">before implementing</span></summary>
+    <div class="pbody">
+      <div class="pnote">Only what the change touches gets covered. <b>Often one test at interface level is enough</b> to run through the affected flow once.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Read spec.md in specs/open/<mark>{{feature}}</mark>/, CLAUDE.md
+and ARCHITECTURE.md.
+
+Before we implement, answer two questions:
+1. What is affected? Every place that calls the code to be changed
+   or depends on it.
+2. Is it covered? Which of these places are covered by tests?
+
+Where tests are missing: suggest the smallest safety net that covers
+the affected flow, e.g. one test at interface level instead of
+many unit tests.
+
+Write the result in progress.md under "Upfront". No code yet.</pre></div>
+    </div>
+  </details>
+
+  </div>
+
+  <p class="plabel">Outlook · Hooks</p>
+  <div class="pl-grid">
+
+  <details class="prompt">
+    <summary><span class="pnum">15</span><span class="ptitle">Set up guard rails</span><span class="pwhen">after the workshop</span></summary>
+    <div class="pbody">
+      <div class="pnote">Hooks run with your user rights. Only add commands you understand. At the end, trigger each rule once on purpose to see that it works. pre-commit with gitleaks or trivy also belongs in the repo and in CI.</div>
+      <div class="pwrap"><button class="copy" data-i18n="copy">Copy</button><pre>Set up the following in .claude/settings.json for this project:
+
+1. A deny rule in permissions so that <mark>{{paths, e.g. .env, secrets/}}</mark>
+   can be neither read nor edited.
+2. A PostToolUse hook for Edit and Write that runs <mark>{{formatter}}</mark>
+   on the changed file.
+3. A Stop hook that runs <mark>{{test command}}</mark> when you're done.
+   If tests fail, you should keep working.
+
+Explain each rule to me in one sentence and show me how I can
+trigger it on purpose, so I can see that it works.</pre></div>
+    </div>
+  </details>
+
+  </div>
+</div>
+
+
+<div class="view notes" id="notes" hidden>
+  <div class="nt">
+    <p class="eyebrow" data-i18n="ntEyebrow">Nur für dich</p>
+    <h2 data-i18n="ntTitle">Workshop-Notizen</h2>
+    <div class="nt-bar">
+      <label for="ntSel"><span data-i18n="ntWorkshop">Workshop</span><select id="ntSel"></select></label>
+      <button type="button" class="btn pri" id="ntNew" data-i18n="ntNew">Neuer Workshop</button>
+      <span class="nt-status" id="ntStatus" aria-live="polite"></span>
+    </div>
+    <div class="nt-empty" id="ntEmpty" hidden><span data-i18n="ntEmptyText"></span></div>
+    <div id="ntBody" hidden>
+      <div class="nt-meta">
+        <label for="ntName"><span data-i18n="ntName">Name</span><input id="ntName" type="text" autocomplete="off"></label>
+        <label for="ntDate"><span data-i18n="ntDate">Datum</span><input id="ntDate" type="date"></label>
+        <label for="ntPlace"><span data-i18n="ntPlace">Kunde / Ort</span><input id="ntPlace" type="text" autocomplete="off"></label>
+        <button type="button" class="btn warn" id="ntDel">Workshop löschen</button>
+      </div>
+      <h3 data-i18n="ntPeople">Teilnehmende</h3>
+      <div class="nt-head"><span data-i18n="ntPName">Name</span><span data-i18n="ntPProj">Projekt Tag 1</span><span data-i18n="ntPTask">Aufgabe Tag 2</span><span data-i18n="ntPNote">Notiz</span><span></span></div>
+      <div class="nt-table" id="ntRows"></div>
+      <div style="margin-top:12px"><button type="button" class="btn" id="ntAdd" data-i18n="ntAdd">+ Teilnehmer:in</button></div>
+      <h3><label for="ntText" style="all:unset" data-i18n="ntNotes">Notizen</label></h3>
+      <textarea id="ntText"></textarea>
+      <div class="nt-actions">
+        <button type="button" class="btn" id="ntMd" data-i18n="ntMd">Export Markdown</button>
+        <button type="button" class="btn" id="ntJson" data-i18n="ntJson">Backup JSON</button>
+        <button type="button" class="btn" id="ntImp" data-i18n="ntImport">Import JSON</button>
+        <input id="ntFile" type="file" accept="application/json,.json" class="vh" tabindex="-1" aria-hidden="true">
+      </div>
+      <p class="nt-store" id="ntStore"></p>
+    </div>
+  </div>
+</div>
+
+</main>
+<div class="counter" id="counter" aria-hidden="true"></div>
+<!-- Icons: Lucide, ISC License, lucide.dev -->
+<script>
+(function(){
+  'use strict';
+
+  var I18N = {
+    de: {
+      workshop:'Workshop', deck:'Präsentation', prompts:'Prompts', notes:'Notizen',
+      copy:'Kopieren', copied:'Kopiert', selected:'Markiert, jetzt kopieren', manual:'Bitte manuell markieren',
+      promptsCount:'15 Prompts', lookDark:'Dunkle Darstellung', lookLight:'Helle Darstellung',
+      ntEyebrow:'Nur für dich', ntTitle:'Workshop-Notizen', ntWorkshop:'Workshop', ntNew:'Neuer Workshop',
+      ntEmptyText:'Noch kein Workshop angelegt. Mit „Neuer Workshop" geht es los.',
+      ntName:'Name', ntDate:'Datum', ntPlace:'Kunde / Ort', ntDel:'Workshop löschen', ntDelConfirm:'Wirklich löschen?',
+      ntPeople:'Teilnehmende', ntPName:'Name', ntPProj:'Projekt Tag 1', ntPTask:'Aufgabe Tag 2', ntPNote:'Notiz',
+      ntAdd:'+ Teilnehmer:in', ntNotes:'Notizen', ntMd:'Export Markdown', ntJson:'Backup JSON', ntImport:'Import JSON',
+      ntRemove:'Entfernen', ntSaving:'Speichert …', ntSaved:'Gespeichert', ntError:'Nicht gespeichert',
+      ntImported:'Importiert', ntImportErr:'Datei konnte nicht gelesen werden', ntUntitled:'Ohne Namen',
+      ntStoreDb:'Gespeichert in deinem Claude-Konto. Nur du siehst diese Notizen.',
+      ntStoreLocal:'Gespeichert nur in diesem Browser. Zum Sichern oder Umziehen: „Backup JSON".',
+      ntStoreNone:'Dieser Browser erlaubt kein Speichern. Notizen gehen beim Schließen verloren. Vorher „Backup JSON".'
+    },
+    en: {
+      workshop:'Workshop', deck:'Presentation', prompts:'Prompts', notes:'Notes',
+      copy:'Copy', copied:'Copied', selected:'Selected, copy now', manual:'Please select manually',
+      promptsCount:'15 prompts', lookDark:'Dark mode', lookLight:'Light mode',
+      ntEyebrow:'Just for you', ntTitle:'Workshop notes', ntWorkshop:'Workshop', ntNew:'New workshop',
+      ntEmptyText:'No workshop yet. Start with "New workshop".',
+      ntName:'Name', ntDate:'Date', ntPlace:'Client / venue', ntDel:'Delete workshop', ntDelConfirm:'Really delete?',
+      ntPeople:'Participants', ntPName:'Name', ntPProj:'Project day 1', ntPTask:'Task day 2', ntPNote:'Note',
+      ntAdd:'+ Participant', ntNotes:'Notes', ntMd:'Export Markdown', ntJson:'Backup JSON', ntImport:'Import JSON',
+      ntRemove:'Remove', ntSaving:'Saving …', ntSaved:'Saved', ntError:'Not saved',
+      ntImported:'Imported', ntImportErr:'Could not read the file', ntUntitled:'Untitled',
+      ntStoreDb:'Saved in your Claude account. Only you can see these notes.',
+      ntStoreLocal:'Saved in this browser only. To back up or move: "Backup JSON".',
+      ntStoreNone:'This browser does not allow saving. Notes are lost when you close it. Use "Backup JSON" first.'
+    }
+  };
+
+  var LS = {
+    ok: (function(){ try{ var k='__aew'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; }catch(e){ return false; } })(),
+    get: function(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+    set: function(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
+  };
+
+  function $(s){ return document.querySelector(s); }
+  function pad(n){ return (n<10?'0':'')+n; }
+
+  var search = location.search + location.hash;
+  var lang = (/[?&]lang=(de|en)/.exec(location.search)||[])[1] || LS.get('aew-lang');
+  if(lang!=='de' && lang!=='en') lang='de';
+  var view='deck', cur=0;
+  var look = (/[?&]theme=(dark|light)/.exec(location.search)||[])[1] || LS.get('aew-look');
+  if(look!=='dark') look='light';
+  var lookBtn = document.getElementById('look');
+
+  var decks = { de:$('#deck-de'), en:$('#deck-en') };
+  var pviews = { de:$('#prompts-de'), en:$('#prompts-en') };
+  var notesView = $('#notes');
+  var tabs = [].slice.call(document.querySelectorAll('#tabs [data-view]'));
+  var langBtns = [].slice.call(document.querySelectorAll('#langs [data-lang]'));
+  var counter=$('#counter'), rail=$('#rail'), chapter=$('#chapter');
+
+  function t(k){ return (I18N[lang] && I18N[lang][k]) || I18N.de[k] || k; }
+  function slides(){ return [].slice.call(decks[lang].querySelectorAll('.slide')); }
+
+  function render(){
+    var s=slides();
+    if(cur>s.length-1) cur=s.length-1;
+    counter.textContent=pad(cur+1)+' / '+pad(s.length);
+    rail.style.width=(view==='deck' ? ((cur+1)/s.length*100) : 100)+'%';
+    if(view==='deck') chapter.textContent=s[cur].getAttribute('data-ch')||'';
+    s.forEach(function(el,i){ el.classList.toggle('on', view==='deck' && i===cur); });
+  }
+
+  function jump(){
+    var d=decks[lang], s=slides();
+    d.style.scrollBehavior='auto';
+    d.scrollTop=s[cur].offsetTop;
+    d.style.scrollBehavior='';
+  }
+
+  ['de','en'].forEach(function(l){
+    var ticking=false;
+    decks[l].addEventListener('scroll',function(){
+      if(l!==lang || view!=='deck' || ticking) return;
+      ticking=true;
+      requestAnimationFrame(function(){
+        var d=decks[l], mid=d.scrollTop+d.clientHeight*0.4, best=0, s=slides();
+        for(var i=0;i<s.length;i++){ if(s[i].offsetTop<=mid) best=i; }
+        if(best!==cur){ cur=best; render(); }
+        ticking=false;
+      });
+    });
+  });
+
+  function go(i){
+    var s=slides();
+    cur=Math.max(0,Math.min(s.length-1,i));
+    decks[lang].scrollTo({top:s[cur].offsetTop,behavior:'smooth'});
+    render();
+  }
+
+  function applyLook(){
+    document.body.classList.toggle('dark', look==='dark');
+    lookBtn.setAttribute('aria-pressed', String(look==='dark'));
+    var lbl=t(look==='dark'?'lookLight':'lookDark');
+    lookBtn.setAttribute('aria-label',lbl); lookBtn.title=lbl;
+  }
+  lookBtn.addEventListener('click',function(){ look = look==='dark'?'light':'dark'; LS.set('aew-look',look); applyLook(); });
+
+  function applyI18n(){
+    document.documentElement.setAttribute('lang',lang);
+    [].forEach.call(document.querySelectorAll('header [data-i18n], #notes [data-i18n]'),function(el){ el.textContent=t(el.getAttribute('data-i18n')); });
+    langBtns.forEach(function(b){ b.setAttribute('aria-pressed',String(b.getAttribute('data-lang')===lang)); });
+    applyLook();
+  }
+
+  function showView(v){
+    view=v;
+    ['de','en'].forEach(function(l){
+      decks[l].hidden = !(v==='deck' && l===lang);
+      pviews[l].hidden = !(v==='prompts' && l===lang);
+    });
+    notesView.hidden = v!=='notes';
+    tabs.forEach(function(b){ b.setAttribute('aria-selected',String(b.getAttribute('data-view')===v)); });
+    counter.hidden = v!=='deck';
+    if(v==='deck'){ jump(); decks[lang].focus({preventScroll:true}); }
+    else if(v==='prompts'){ chapter.textContent=t('promptsCount'); pviews[lang].scrollTop=0; }
+    else { chapter.textContent=t('notes'); Notes.render(); }
+    render();
+  }
+
+  function setLang(l){
+    if(l===lang) return;
+    lang=l; LS.set('aew-lang',l);
+    applyI18n();
+    Notes.relabel();
+    showView(view);
+  }
+
+  tabs.forEach(function(b){ b.addEventListener('click',function(){ showView(b.getAttribute('data-view')); }); });
+  langBtns.forEach(function(b){ b.addEventListener('click',function(){ setLang(b.getAttribute('data-lang')); }); });
+
+  document.addEventListener('keydown',function(e){
+    if(view!=='deck') return;
+    if(e.target.closest && e.target.closest('button, input, textarea, select, summary, a')) return;
+    var k=e.key;
+    if(k==='ArrowDown'||k==='ArrowRight'||k==='PageDown'||k===' '){ e.preventDefault(); go(cur+1); }
+    else if(k==='ArrowUp'||k==='ArrowLeft'||k==='PageUp'){ e.preventDefault(); go(cur-1); }
+    else if(k==='Home'){ e.preventDefault(); go(0); }
+    else if(k==='End'){ e.preventDefault(); go(slides().length-1); }
+  });
+
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest && e.target.closest('.copy'); if(!btn) return;
+    var pre=btn.parentNode.querySelector('pre'), text=pre.innerText;
+    var done=function(k){ btn.textContent=t(k); setTimeout(function(){ btn.textContent=t('copy'); },1800); };
+    function select(){
+      try{ var r=document.createRange(); r.selectNodeContents(pre); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); done('selected'); }
+      catch(err){ done('manual'); }
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){ done('copied'); },select); }
+    else select();
+  });
+
+  /* ================= Notes ================= */
+  var Notes = (function(){
+    var KEY='aew-notes-v1';
+    var state={v:1,current:null,workshops:[]};
+    var mode = LS.ok ? 'local' : 'none';
+    var ref=null, dl=null, timer=null, chain=Promise.resolve(), dirty=false, pendingRemote=null, delTimer=null, lastSent=null;
+    function el(id){ return document.getElementById(id); }
+    function mkid(p){ return p+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4); }
+    function clone(o){ return JSON.parse(JSON.stringify(o)); }
+    function stable(o){
+      if(Array.isArray(o)) return '['+o.map(stable).join(',')+']';
+      if(o && typeof o==='object') return '{'+Object.keys(o).sort().map(function(k){ return JSON.stringify(k)+':'+stable(o[k]); }).join(',')+'}';
+      return JSON.stringify(o);
+    }
+    function valid(d){ return !!d && Array.isArray(d.workshops); }
+    function cw(){ for(var i=0;i<state.workshops.length;i++){ if(state.workshops[i].id===state.current) return state.workshops[i]; } return null; }
+    function status(k){ el('ntStatus').textContent = k ? t(k) : ''; }
+    function today(){ var d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+
+    function persist(){
+      if(mode==='db'){
+        var body=clone(state); lastSent=stable(body);
+        chain=chain.then(function(){ return ref.set(body); }).then(function(){ dirty=false; status('ntSaved'); },function(){ dirty=false; status('ntError'); });
+      } else if(mode==='local'){
+        dirty=false; status(LS.set(KEY,JSON.stringify(state)) ? 'ntSaved' : 'ntError');
+      } else { dirty=false; status(''); }
+    }
+    function schedule(){ dirty=true; if(mode!=='none') status('ntSaving'); clearTimeout(timer); timer=setTimeout(persist,700); }
+    function saveNow(){ clearTimeout(timer); dirty=true; persist(); }
+
+    function isEditing(){ var a=document.activeElement; return !!(a && notesView.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); }
+
+    function fillSelect(){
+      var sel=el('ntSel'); sel.innerHTML='';
+      state.workshops.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); }).forEach(function(w){
+        var o=document.createElement('option'); o.value=w.id;
+        o.textContent=(w.name||t('ntUntitled'))+(w.date?' · '+w.date:'');
+        sel.appendChild(o);
+      });
+      sel.disabled=!state.workshops.length;
+      if(state.current) sel.value=state.current;
+    }
+
+    function rowEl(p){
+      var r=document.createElement('div'); r.className='nt-row'; r.setAttribute('data-id',p.id);
+      [['name','input','ntPName'],['project','textarea','ntPProj'],['task','textarea','ntPTask'],['note','textarea','ntPNote']].forEach(function(f){
+        var x=document.createElement(f[1]);
+        if(f[1]==='input') x.type='text';
+        x.setAttribute('data-f',f[0]); x.setAttribute('data-ph',f[2]);
+        x.placeholder=t(f[2]); x.setAttribute('aria-label',t(f[2]));
+        x.value=p[f[0]]||'';
+        r.appendChild(x);
+      });
+      var b=document.createElement('button'); b.type='button'; b.className='nt-x'; b.textContent='×';
+      b.setAttribute('aria-label',t('ntRemove')); b.title=t('ntRemove');
+      r.appendChild(b);
+      return r;
+    }
+
+    function render(){
+      if(!state.current && state.workshops.length) state.current=state.workshops[0].id;
+      var w=cw();
+      if(!w && state.workshops.length){ state.current=state.workshops[0].id; w=cw(); }
+      fillSelect();
+      el('ntEmpty').hidden=!!w; el('ntBody').hidden=!w;
+      el('ntStore').textContent=t(mode==='db'?'ntStoreDb':(mode==='local'?'ntStoreLocal':'ntStoreNone'));
+      armDel(false);
+      if(!w) return;
+      el('ntName').value=w.name||''; el('ntDate').value=w.date||''; el('ntPlace').value=w.place||''; el('ntText').value=w.notes||'';
+      var box=el('ntRows'); box.innerHTML='';
+      (w.participants||[]).forEach(function(p){ box.appendChild(rowEl(p)); });
+    }
+
+    function relabel(){
+      [].forEach.call(document.querySelectorAll('#ntRows [data-ph]'),function(x){ x.placeholder=t(x.getAttribute('data-ph')); x.setAttribute('aria-label',t(x.getAttribute('data-ph'))); });
+      [].forEach.call(document.querySelectorAll('#ntRows .nt-x'),function(b){ b.setAttribute('aria-label',t('ntRemove')); b.title=t('ntRemove'); });
+      el('ntStore').textContent=t(mode==='db'?'ntStoreDb':(mode==='local'?'ntStoreLocal':'ntStoreNone'));
+      fillSelect(); armDel(false);
+    }
+
+    function armDel(on){
+      clearTimeout(delTimer);
+      var b=el('ntDel'); b.setAttribute('data-armed',on?'1':'');
+      b.textContent=t(on?'ntDelConfirm':'ntDel');
+      if(on) delTimer=setTimeout(function(){ armDel(false); },4000);
+    }
+
+    function download(name,data,mime){
+      if(dl){ dl.save({filename:name,data:data}).catch(function(e){ if(!e || e.code!=='declined') status('ntError'); }); return; }
+      try{
+        var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:mime})); a.download=name;
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },800);
+      }catch(e){ status('ntError'); }
+    }
+    function slug(s){ return (s||'workshop').toLowerCase().replace(/[^a-z0-9äöüß]+/g,'-').replace(/^-|-$/g,'') || 'workshop'; }
+    function cell(s){ return String(s||'').replace(/\|/g,'\\|').replace(/\r?\n/g,'<br>'); }
+
+    function toMarkdown(w){
+      var L=[];
+      L.push('# '+(w.name||t('ntUntitled')));
+      var meta=[w.date,w.place].filter(Boolean).join(' · '); if(meta) L.push('', meta);
+      L.push('', '## '+t('ntPeople'), '');
+      L.push('| '+[t('ntPName'),t('ntPProj'),t('ntPTask'),t('ntPNote')].join(' | ')+' |');
+      L.push('|---|---|---|---|');
+      (w.participants||[]).forEach(function(p){ L.push('| '+[p.name,p.project,p.task,p.note].map(cell).join(' | ')+' |'); });
+      if(w.notes){ L.push('', '## '+t('ntNotes'), '', w.notes); }
+      return L.join('\n')+'\n';
+    }
+
+    function bind(){
+      el('ntSel').addEventListener('change',function(e){ state.current=e.target.value; render(); saveNow(); });
+      el('ntNew').addEventListener('click',function(){
+        var w={id:mkid('w_'),name:'',date:today(),place:'',notes:'',participants:[]};
+        state.workshops.push(w); state.current=w.id; render(); saveNow(); el('ntName').focus();
+      });
+      [['ntName','name'],['ntDate','date'],['ntPlace','place'],['ntText','notes']].forEach(function(p){
+        el(p[0]).addEventListener('input',function(e){ var w=cw(); if(!w) return; w[p[1]]=e.target.value; if(p[1]==='name'||p[1]==='date') fillSelect(); schedule(); });
+      });
+      el('ntRows').addEventListener('input',function(e){
+        var f=e.target.getAttribute('data-f'); if(!f) return;
+        var id=e.target.closest('.nt-row').getAttribute('data-id'), w=cw(); if(!w) return;
+        w.participants.forEach(function(p){ if(p.id===id) p[f]=e.target.value; });
+        schedule();
+      });
+      el('ntRows').addEventListener('click',function(e){
+        if(!e.target.classList.contains('nt-x')) return;
+        var r=e.target.closest('.nt-row'), id=r.getAttribute('data-id'), w=cw(); if(!w) return;
+        w.participants=w.participants.filter(function(p){ return p.id!==id; });
+        r.remove(); saveNow();
+      });
+      el('ntAdd').addEventListener('click',function(){
+        var w=cw(); if(!w) return;
+        var p={id:mkid('p_'),name:'',project:'',task:'',note:''};
+        w.participants.push(p); var r=rowEl(p); el('ntRows').appendChild(r); r.querySelector('input').focus(); saveNow();
+      });
+      el('ntDel').addEventListener('click',function(){
+        if(el('ntDel').getAttribute('data-armed')!=='1'){ armDel(true); return; }
+        state.workshops=state.workshops.filter(function(w){ return w.id!==state.current; });
+        state.current=state.workshops.length?state.workshops[0].id:null;
+        render(); saveNow();
+      });
+      el('ntMd').addEventListener('click',function(){ var w=cw(); if(w) download('workshop-'+slug(w.name||w.date)+'.md',toMarkdown(w),'text/markdown'); });
+      el('ntJson').addEventListener('click',function(){ download('workshop-notes-'+today()+'.json',JSON.stringify(state,null,2),'application/json'); });
+      el('ntImp').addEventListener('click',function(){ el('ntFile').click(); });
+      el('ntFile').addEventListener('change',function(e){
+        var file=e.target.files && e.target.files[0]; if(!file) return;
+        var rd=new FileReader();
+        rd.onload=function(){
+          try{
+            var d=JSON.parse(String(rd.result)); if(!valid(d)) throw new Error('shape');
+            d.workshops.forEach(function(w){
+              if(!w || typeof w!=='object') return;
+              var clean={id:String(w.id||mkid('w_')),name:String(w.name||''),date:String(w.date||''),place:String(w.place||''),notes:String(w.notes||''),
+                participants:(Array.isArray(w.participants)?w.participants:[]).map(function(p){ return {id:String(p.id||mkid('p_')),name:String(p.name||''),project:String(p.project||''),task:String(p.task||''),note:String(p.note||'')}; })};
+              var i=-1; state.workshops.forEach(function(x,j){ if(x.id===clean.id) i=j; });
+              if(i>=0) state.workshops[i]=clean; else state.workshops.push(clean);
+              state.current=clean.id;
+            });
+            render(); saveNow(); status('ntImported');
+          }catch(err){ status('ntImportErr'); }
+          e.target.value='';
+        };
+        rd.readAsText(file);
+      });
+      notesView.addEventListener('focusout',function(){
+        setTimeout(function(){ if(pendingRemote && !isEditing() && !dirty){ state=pendingRemote; pendingRemote=null; render(); } },0);
+      });
+    }
+
+    function showTab(){ var b=document.querySelector('#tabs [data-view="notes"]'); if(b) b.hidden=false; }
+
+    function init(){
+      if(mode==='local'){ var raw=LS.get(KEY); if(raw){ try{ var d=JSON.parse(raw); if(valid(d)) state=d; }catch(e){} } }
+      if(/(^|[?&#])trainer(\b|=)/.test(search)) LS.set('aew-trainer','1');
+      if(/(^|[?&#])trainer(\b|=)/.test(search) || LS.get('aew-trainer')==='1') showTab();
+      bind();
+      if(!(window.claude && typeof window.claude.use==='function')) return;
+      Promise.all([window.claude.use('db'),window.claude.use('user'),window.claude.use('downloads')]).then(function(r){
+        var db=r[0], user=r[1]; dl=r[2]||null;
+        if(!db || !user) return;
+        return Promise.all([user.id(),user.isOwner()]).then(function(x){
+          var id=x[0], owner=x[1];
+          if(owner) showTab();
+          if(!id) return;
+          ref=db.doc('data/users/'+id+'/notes'); mode='db';
+          var first=true;
+          ref.onSnapshot(function(snap){
+            var d=snap.exists ? snap.data() : null;
+            if(first){
+              first=false;
+              if(valid(d)) state=clone(d); else if(state.workshops.length) saveNow();
+              render(); return;
+            }
+            if(!valid(d) || (snap.metadata && snap.metadata.hasPendingWrites) || dirty) return;
+            var s=stable(d); if(s===lastSent || s===stable(state)) return;
+            if(isEditing()){ pendingRemote=clone(d); return; }
+            state=clone(d); render();
+          },function(){ mode=LS.ok?'local':'none'; render(); });
+        });
+      }).catch(function(){});
+    }
+
+    return { init:init, render:render, relabel:relabel };
+  })();
+
+  applyI18n();
+  Notes.init();
+  showView('deck');
+})();
+
+</script>
+</body>
+</html>
